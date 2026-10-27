@@ -1,5 +1,5 @@
 /* 트립첵! 가족판 — 파이어베이스 연결
-   - 캠첵!과 같은 파이어베이스 프로젝트를 쓰되, 자료는 tripFamilies / tripUsers 에 따로 둠
+   - 캠첵!과 따로 쓰는 파이어베이스 프로젝트(trip--check), 자료는 tripFamilies / tripUsers
    - 구글 로그인, 가족 공간(tripFamilies/{id}) 하나를 가족이 함께 씀
    - 체크는 한 칸씩, 목록·여행 정보는 통째로 저장
    - 인터넷이 끊겨도 이 기기에 두었다가 연결되면 올라감
@@ -84,13 +84,21 @@ async function start(){
       await F.setDoc(F.doc(db, USERS, me.uid), { family: F.deleteField() }, { merge: true });
       stop(); C().leaveFamily(); C().setAccount({ phase: "nofamily", user: me });
     },
-    /* 트립첵! 자료 모두 지우기 — 구글 로그인 계정은 캠첵!과 함께 쓰므로 지우지 않고 로그아웃만 함 */
+    /* 계정과 자료 모두 지우기 */
     async deleteAccount(){
       if (!me) throw new Error("먼저 로그인해 주세요.");
       if (fid) await leaveOrWipe(fid);
       stop();
       try{ await F.deleteDoc(F.doc(db, USERS, me.uid)); }catch(e){}
-      await A.signOut(auth);
+      const u = auth.currentUser;
+      try{ await A.deleteUser(u); }
+      catch(e){
+        if (e && e.code === "auth/requires-recent-login"){
+          const p = new A.GoogleAuthProvider(); p.setCustomParameters({ prompt: "select_account" });
+          await A.reauthenticateWithPopup(u, p);
+          await A.deleteUser(u);
+        } else throw friendly(e);
+      }
     },
     async createFamily(name, data, localRecords){
       if (!me) throw new Error("먼저 로그인해 주세요.");
