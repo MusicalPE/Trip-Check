@@ -496,6 +496,11 @@ body.dragging,body.dragging *{user-select:none!important;-webkit-user-select:non
 .padd .field{font-size:14px;padding:9px 12px;min-width:0}
 @media (min-width:900px){.padd{grid-template-columns:auto 1fr 1.3fr auto}.padd #planMemo,.padd .primary{grid-column:auto}}
 
+/* 장소 링크 줄바꿈 다듬기 */
+.place-links{flex-wrap:wrap;gap:2px 8px;word-break:keep-all;line-height:1.5}
+.place-links a{white-space:nowrap}
+.wx-note{word-break:keep-all}
+
 /* 항목 이름도 낱말 단위로만 줄바꿈 */
 li .txt,.rplace,.place-list .pn{word-break:keep-all;overflow-wrap:break-word}
 
