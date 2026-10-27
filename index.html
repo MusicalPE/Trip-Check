@@ -548,6 +548,8 @@ body.dragging,body.dragging *{user-select:none!important;-webkit-user-select:non
 .wx-pick button small{display:block;font-size:11.5px;color:var(--muted);font-weight:600}
 .wx-pick button:hover{border-color:var(--forest)}
 
+@media (max-width:560px){body.fam-in #acct{display:none!important}}
+
 /* 항목 이름도 낱말 단위로만 줄바꿈 */
 li .txt,.rplace,.place-list .pn{word-break:keep-all;overflow-wrap:break-word}
 
@@ -1543,6 +1545,7 @@ function showConnState(){
 window.addEventListener("online", showConnState);
 window.addEventListener("offline", showConnState);
 function renderAccount(){
+  document.body.classList.toggle("fam-in", ACCOUNT.phase === "in");   // 휴대폰: 가족 공간에 들어와 있으면 체크 화면의 계정 줄은 숨김(가족 탭에 있음)
   const a = ACCOUNT;
   famEl.hidden = a.phase !== "nofamily";
   acctDot.className = "dot" + (a.phase === "in" ? (navigator.onLine ? " on" : " off") : "");
