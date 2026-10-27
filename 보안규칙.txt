@@ -1,0 +1,95 @@
+* 캠첵!과 트립첵!이 같은 파이어베이스 프로젝트를 써서, 보안 규칙도 하나예요.
+* 파이어베이스 콘솔 > Firestore Database > 규칙 탭에서 지금 내용을 모두 지우고, 아래 rules_version 줄부터 끝까지 통째로 붙여 넣은 뒤 [게시]를 눌러 주세요.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+
+    // 내 계정이 어느 가족 공간에 들어 있는지 (나만 읽고 씀)
+    match /users/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // 가족 공간: 가족(members)만 읽고 씀
+    match /families/{fid} {
+      function isMember() { return signedIn() && request.auth.uid in resource.data.members; }
+
+      allow read: if isMember();
+
+      // 만들 때는 만든 사람 혼자 가족
+      allow create: if signedIn()
+        && request.resource.data.owner == request.auth.uid
+        && request.resource.data.members == [request.auth.uid];
+
+      // 가족은 고칠 수 있음(만든 사람 바꾸기는 만든 사람만 — 나갈 때 남은 가족에게 넘김)
+      // 가족이 아닌 사람은 초대 코드를 알 때 자기 자신만 가족으로 넣을 수 있음
+      allow update: if (isMember() && (request.resource.data.owner == resource.data.owner || resource.data.owner == request.auth.uid))
+        || (signedIn()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'memberInfo', 'joinWith'])
+            && request.resource.data.joinWith == resource.data.invite
+            && request.resource.data.members.toSet() == resource.data.members.toSet().union([request.auth.uid].toSet()));
+
+      // 지우기: 만든 사람, 또는 혼자 남은 가족
+      allow delete: if signedIn() && (request.auth.uid == resource.data.owner
+        || (isMember() && resource.data.members.size() == 1));
+
+      // 캠핑 기록: 가족만
+      match /records/{rid} {
+        allow read, write: if signedIn()
+          && request.auth.uid in get(/databases/$(database)/documents/families/$(fid)).data.members;
+      }
+    }
+
+    // 캠핑장 별점 나누기: 로그인한 사람은 누구나 볼 수 있고, 가족마다 한 표만 씀
+    // (가족 이름·이메일은 올라가지 않고, 별점과 다녀온 횟수만 올라감)
+    match /campsites/{pid} {
+      allow read: if signedIn();
+      allow write: if signedIn() && pid.matches('k[0-9]+')
+        && request.resource.data.keys().hasOnly(['name', 'addr', 'url', 'updatedAt']);
+
+      match /ratings/{fid} {
+        function isFamily() {
+          return signedIn() && request.auth.uid in get(/databases/$(database)/documents/families/$(fid)).data.members;
+        }
+        allow read: if signedIn();
+        allow create, update: if isFamily()
+          && request.resource.data.keys().hasOnly(['stars', 'visits', 'updatedAt'])
+          && request.resource.data.stars is number
+          && request.resource.data.stars >= 0.5 && request.resource.data.stars <= 5;
+        allow delete: if isFamily();
+      }
+    }
+
+    // ===== 트립첵! (여행 체크리스트) — 캠첵!과 자료를 따로 둠 =====
+    match /tripUsers/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    match /tripFamilies/{fid} {
+      function isTripMember() { return signedIn() && request.auth.uid in resource.data.members; }
+
+      allow read: if isTripMember();
+
+      allow create: if signedIn()
+        && request.resource.data.owner == request.auth.uid
+        && request.resource.data.members == [request.auth.uid];
+
+      allow update: if (isTripMember() && (request.resource.data.owner == resource.data.owner || resource.data.owner == request.auth.uid))
+        || (signedIn()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'memberInfo', 'joinWith'])
+            && request.resource.data.joinWith == resource.data.invite
+            && request.resource.data.members.toSet() == resource.data.members.toSet().union([request.auth.uid].toSet()));
+
+      allow delete: if signedIn() && (request.auth.uid == resource.data.owner
+        || (isTripMember() && resource.data.members.size() == 1));
+
+      // 여행 기록: 가족만
+      match /records/{rid} {
+        allow read, write: if signedIn()
+          && request.auth.uid in get(/databases/$(database)/documents/tripFamilies/$(fid)).data.members;
+      }
+    }
+  }
+}

@@ -1,0 +1,1576 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>트립첵!</title>
+<meta name="theme-color" content="#2C6CA6">
+<meta name="description" content="가족이 함께 쓰는 여행 준비물 체크리스트">
+<meta property="og:type" content="website">
+<meta property="og:title" content="트립첵! Trip-Check">
+<meta property="og:description" content="가족이 함께 쓰는 여행 준비물 체크리스트">
+<meta property="og:url" content="https://musicalpe.github.io/Trip-Check/">
+<meta property="og:image" content="https://musicalpe.github.io/Trip-Check/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="트립첵!">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Nanum+Gothic:wght@400;700;800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 숲 속 사이트 안내판 느낌 — 상단 여행 정보 + 전체 진행 막대, 구역별 카드 격자, 맨 아래 날짜별 여행 기록 */
+/* 트립첵! 그림 톤: 맑은 하늘, 바다 파랑, 크림 캐리어, 노을 주황 */
+:root{
+  --bg:#F1F6FB; --surface:#FFFFFF; --ink:#1F2C3A; --muted:#5B6B7D; --line:#D5E2EE;
+  --accent:#E2763A; --accent-soft:#FDEFE6; --forest:#2C6CA6; --done:#94A3B3; --on-forest:#FFFFFF; --danger:#C94A35;
+  --sky:#8FC3EC; --tree:#3E8E6B; --star:#F2A93B;
+  --f-display:"Do Hyeon","Noto Sans KR",sans-serif;
+  --f-body:"Nanum Gothic","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111821; --surface:#19232F; --ink:#E2EAF3; --muted:#98A9BB; --line:#2A3A4B;
+  --accent:#F29B63; --accent-soft:#38271C; --forest:#7DB7EA; --done:#66788B; --on-forest:#111821; --danger:#E67E6C;
+  --sky:#22405E; --tree:#6FBF98; --star:#F5B95C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111821; --surface:#19232F; --ink:#E2EAF3; --muted:#98A9BB; --line:#2A3A4B;
+  --accent:#F29B63; --accent-soft:#38271C; --forest:#7DB7EA; --done:#66788B; --on-forest:#111821; --danger:#E67E6C;
+  --sky:#22405E; --tree:#6FBF98; --star:#F5B95C; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:linear-gradient(180deg,color-mix(in srgb,var(--sky) 28%,var(--bg)) 0,var(--bg) 380px) no-repeat,var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 56px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+button{font:inherit}
+input,textarea{font:inherit;color:var(--ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header{display:grid;grid-template-columns:1fr auto;gap:20px 28px;align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:0 8px 24px rgba(44,108,166,.06)}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;font-weight:700}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(34px,6vw,50px);line-height:1.1;margin:4px 0 0;text-wrap:balance;color:var(--forest)}
+.trip{display:grid;grid-template-columns:1.2fr .6fr 1.6fr .9fr;gap:12px;grid-column:1/-1;margin-top:6px}
+.trip label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--muted);min-width:0}
+.field{font-size:15px;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;width:100%;transition:border-color .2s,box-shadow .2s}
+.field:focus{border-color:var(--forest);background:var(--surface);box-shadow:0 0 0 3px color-mix(in srgb,var(--forest) 15%,transparent)}
+
+.brand{display:flex;align-items:center;gap:20px;min-width:0}
+.logo{width:clamp(88px,14vw,132px);height:auto;flex:none;border-radius:50%;object-fit:cover;box-shadow:0 6px 16px rgba(44,108,166,.18)}
+.brand-text{min-width:0}
+.brand h1{font-size:clamp(22px,4.4vw,40px);white-space:nowrap}
+.meter{text-align:right;background:color-mix(in srgb,var(--bg) 60%,var(--surface));border:1.5px solid var(--line);border-radius:18px;padding:14px 20px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center}
+.qr-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;border:1.5px solid var(--forest);background:var(--surface);color:var(--forest);border-radius:99px;padding:7px 14px;cursor:pointer;margin-bottom:8px;transition:all .2s}
+.qr-btn:hover{background:var(--forest);color:var(--on-forest)}
+.qr-modal{position:fixed;inset:0;z-index:50;background:rgba(18,26,23,.6);backdrop-filter:blur(4px);display:grid;place-items:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.qr-card{background:var(--surface);color:var(--ink);border-radius:24px;padding:26px;width:min(380px,100%);display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.25);border:1px solid var(--line)}
+.qr-card h3{font-family:var(--f-body);font-weight:700;font-size:21px;margin:0;color:var(--forest)}
+.qr-card p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.5}
+.qr-box{background:#fff;border-radius:16px;padding:14px;width:min(260px,100%);box-shadow:inset 0 0 0 1px #E1ECE8}
+.qr-box svg,.qr-box img{display:block;width:100%;height:auto}
+.qr-card .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;width:100%}
+.qr-card .warn{color:var(--danger);font-size:12px;font-weight:600}
+.meter .num{font-family:var(--f-mono);font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--forest)}
+.meter .num small{font-size:16px;color:var(--muted);font-weight:normal}
+.meter .cap{font-size:13px;font-weight:700;color:var(--muted);margin-top:2px}
+
+.bar{height:12px;background:var(--line);border-radius:99px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.06)}
+.bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .4s cubic-bezier(0.4,0,0.2,1)}
+.bar.full i{background:var(--forest)}
+
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 18px}
+.chip{font-size:13.5px;font-weight:700;border:1.5px solid var(--line);background:var(--bg);color:var(--muted);border-radius:99px;padding:8px 16px;cursor:pointer;transition:all .2s}
+.chip:hover{border-color:var(--forest);color:var(--forest)}
+.chip[aria-pressed="true"]{background:var(--forest);color:var(--on-forest);border-color:var(--forest);box-shadow:0 4px 12px color-mix(in srgb,var(--forest) 30%,transparent)}
+.spacer{flex:1}
+.chips{display:contents}
+.chip.ghost{border-style:dashed;color:var(--muted);background:transparent}
+.chip.ghost[aria-expanded="true"]{border-style:solid;border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.labels-panel{background:var(--surface);border:2px dashed var(--accent);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 30px rgba(217,107,39,.08)}
+.lp-head{display:flex;justify-content:space-between;align-items:baseline}
+.labels-panel h3{font-family:var(--f-body);font-weight:700;font-size:19px;margin:0;color:var(--forest)}
+.labels-panel p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.5}
+.lp-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.lp-list li{gap:12px;background:var(--bg);padding:8px 12px;border-radius:12px;border:1px solid var(--line)}
+.lp-list .lname{flex:1;min-width:0;font-size:15px;font-weight:700;border:none;border-bottom:1.5px solid var(--line);background:transparent;padding:4px 0}
+.lp-list .lname:focus{outline:none;border-color:var(--accent)}
+.lp-list .lcount{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;background:var(--surface);padding:2px 8px;border-radius:6px;border:1px solid var(--line)}
+.qlabels{display:flex;flex-wrap:wrap;gap:6px;align-items:center;width:100%;font-size:12.5px;color:var(--muted);background:var(--bg);padding:8px;border-radius:10px;border:1px solid var(--line)}
+.qlabels > span{font-weight:700;color:var(--forest);margin-right:4px}
+.edit-btn{font-size:13.5px;font-weight:700;border:1.5px solid var(--accent);background:transparent;color:var(--accent);border-radius:99px;padding:7px 16px;cursor:pointer;transition:all .2s}
+.edit-btn[aria-pressed="true"]{background:var(--accent);color:var(--on-forest)}
+.link{font-size:13.5px;font-weight:600;border:none;background:none;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:4px;padding:2px}
+.link:hover{color:var(--forest)}
+.link.warn{color:var(--danger)}
+.confirm{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;background:var(--accent-soft);padding:6px 10px;border-radius:8px}
+.confirm button{font-size:12.5px;font-weight:700;border-radius:6px;padding:5px 10px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.confirm .yes{background:var(--accent);border-color:var(--accent);color:var(--on-forest)}
+
+.edit-note{font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:12px;padding:12px 16px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:20px;align-items:start}
+.zone{background:var(--surface);border:1.5px solid var(--line);border-radius:22px;box-shadow:0 4px 16px rgba(34,48,42,.04);padding:20px 20px 16px;display:flex;flex-direction:column;gap:14px;min-width:0;transition:all .2s}
+.zone:hover{border-color:color-mix(in srgb,var(--forest) 40%,var(--line));box-shadow:0 8px 24px rgba(34,48,42,.07)}
+.zone-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.zone-head > div{min-width:0}
+.zone h2{font-family:var(--f-display);font-weight:400;font-size:23px;margin:0;overflow-wrap:anywhere;display:flex;align-items:center;gap:6px;color:var(--forest)}
+.zone .sub{font-size:13px;color:var(--muted);margin-top:3px;font-weight:600}
+.zone .cnt{font-family:var(--f-mono);font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;background:var(--bg);padding:4px 10px;border-radius:8px;border:1px solid var(--line)}
+.zone.complete .cnt{color:var(--forest);background:color-mix(in srgb,var(--forest) 12%,var(--bg));border-color:color-mix(in srgb,var(--forest) 30%,var(--line))}
+.zone .bar{height:6px}
+.zone .empty{font-size:13.5px;color:var(--muted);text-align:center;padding:12px 0;background:var(--bg);border-radius:10px;border:1px dashed var(--line)}
+.ztag{font-size:11.5px;font-weight:700;color:var(--forest);border:1px solid color-mix(in srgb,var(--forest) 40%,var(--line));background:color-mix(in srgb,var(--forest) 10%,var(--surface));border-radius:99px;padding:2px 8px;vertical-align:2px;font-family:var(--f-body);white-space:nowrap}
+
+.zedit{display:flex;flex-direction:column;gap:8px}
+.zname{font-family:var(--f-body);font-weight:700;font-size:20px;border:none;border-bottom:2px solid var(--accent);background:var(--accent-soft);padding:6px 10px;border-radius:8px 8px 0 0;width:100%}
+.zsub{font-size:13.5px;border:none;border-bottom:1.5px solid var(--line);background:transparent;padding:4px 0;color:var(--muted);width:100%}
+.zname:focus,.zsub:focus,.iname:focus{border-color:var(--accent);outline:none}
+
+ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+li{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;border:1px solid transparent;transition:background .15s,border-color .15s}
+li:hover{background:var(--bg);border-color:var(--line)}
+li label{display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;min-width:0}
+input[type=checkbox]{appearance:none;width:22px;height:22px;flex:none;border:2px solid var(--muted);border-radius:6px;display:grid;place-content:center;cursor:pointer;background:var(--surface);margin:0;transition:all .2s}
+input[type=checkbox]::after{content:"";width:11px;height:6px;border-left:2.5px solid var(--on-forest);border-bottom:2.5px solid var(--on-forest);transform:rotate(-45deg) translate(1px,-1px);opacity:0;transition:opacity .15s}
+input[type=checkbox]:checked{background:var(--forest);border-color:var(--forest);box-shadow:0 2px 6px color-mix(in srgb,var(--forest) 40%,transparent)}
+input[type=checkbox]:checked::after{opacity:1}
+li .txt{overflow-wrap:anywhere;font-weight:600;font-size:15px}
+li > .tag + .tag{margin-left:-4px}
+li.on .txt{color:var(--done);text-decoration:line-through;font-weight:normal}
+.tag{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);white-space:nowrap;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent)}
+body.hide-done li.on{display:none}
+
+.iname{flex:1;min-width:0;border:none;border-bottom:1.5px solid var(--line);background:transparent;padding:4px 0;font-size:15px;font-weight:600}
+.iname:hover{border-bottom-color:var(--accent)}
+.ctog{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;cursor:pointer;white-space:nowrap;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);transition:all .2s}
+.ctog[aria-pressed="true"]{border:1.5px solid var(--accent);background:var(--accent-soft);color:var(--accent);box-shadow:0 2px 6px color-mix(in srgb,var(--accent) 20%,transparent)}
+.del{border:none;background:none;color:var(--muted);cursor:pointer;font-size:19px;line-height:1;padding:4px 8px;border-radius:6px}
+.del:hover{color:var(--danger);background:color-mix(in srgb,var(--danger) 10%,transparent)}
+
+.pen{flex:none;display:inline-grid;place-items:center;width:32px;height:32px;border:none;border-radius:8px;background:transparent;color:var(--muted);opacity:.5;cursor:pointer;padding:0;transition:all .2s}
+.pen:hover,.pen:focus-visible{opacity:1;color:var(--accent);background:var(--accent-soft)}
+li:hover .pen{opacity:.85}
+@media (hover:none){.pen{opacity:.8}}
+.trash:hover,.trash:focus-visible{color:var(--danger);background:color-mix(in srgb,var(--danger) 10%,transparent)}
+li .pen + .trash{margin-left:-4px}
+.askdel{background:var(--accent-soft)!important;border-radius:12px;padding:10px 12px!important;flex-wrap:wrap;border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.askdel .txt{flex:1;min-width:0;font-weight:700;color:var(--accent)}
+.pen-z{width:28px;height:28px;margin-left:6px;vertical-align:2px}
+.qrow{padding:8px;background:var(--bg);border-radius:12px;border:1.5px solid var(--accent)}
+.qedit{display:flex;gap:8px;flex:1;min-width:0;flex-wrap:wrap}
+.qinput{flex:1 1 160px;min-width:0;font-size:15px;font-weight:600;background:var(--surface);border:1.5px solid var(--accent);border-radius:10px;padding:8px 12px}
+.qedit button,.qbtns button{font-size:13.5px;font-weight:700;border-radius:10px;padding:8px 14px;cursor:pointer;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);transition:all .2s}
+.qedit .qsave,.qbtns .qsave{background:var(--accent);border-color:var(--accent);color:var(--on-forest);box-shadow:0 4px 12px color-mix(in srgb,var(--accent) 30%,transparent)}
+.qedit .qdel{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 30%,var(--line))}
+.qzone{display:flex;flex-direction:column;gap:10px;background:var(--bg);padding:14px;border-radius:16px;border:1.5px solid var(--accent)}
+.grip{display:none;flex:none;place-items:center;width:24px;height:32px;color:var(--muted);opacity:.4;cursor:grab;touch-action:none;margin-left:-4px;border-radius:4px}
+.grip:hover{background:var(--bg);opacity:1;color:var(--forest)}
+.can-drag .grip{display:inline-grid}
+@media (hover:none){.grip{opacity:.7}}
+.zgrip{height:28px;align-self:center;margin-right:2px}
+.zone-head{align-items:center}
+.zh-text{flex:1;min-width:0}
+ul.items{min-height:10px}
+.drag-ghost{opacity:.4;background:var(--accent-soft)!important;border:2px dashed var(--accent)!important;border-radius:12px}
+.drag-chosen{background:var(--surface);box-shadow:0 12px 30px rgba(0,0,0,.12)}
+.sortable-fallback{box-shadow:0 14px 32px rgba(0,0,0,.2);border-radius:16px;background:var(--surface);list-style:none;padding:12px}
+.qmove{display:inline-flex;gap:4px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:60;max-width:min(92vw,460px);
+  background:var(--forest);color:var(--on-forest);font-size:14px;font-weight:600;line-height:1.5;padding:14px 20px;border-radius:16px;box-shadow:0 12px 35px rgba(44,108,166,.35);text-align:center;border:1px solid color-mix(in srgb,var(--on-forest) 20%,transparent)}
+.qmove button{font-size:12px;line-height:1;width:34px;height:30px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.qmove button:hover{border-color:var(--accent);color:var(--accent)}
+.qzsel{font:inherit;font-size:13.5px;font-weight:600;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;max-width:100%;min-width:0}
+.qbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.qzone .confirm{font-size:12.5px;color:var(--muted)}
+.list-foot{text-align:right;margin-top:4px}
+.conn-foot{text-align:center;margin-top:4px}
+.conn-foot .link{font-size:13px;opacity:.85}
+.qadd input{font-size:14px;padding:8px 12px;font-weight:600}
+.qadd button{font-size:13px;font-weight:700}
+.add{display:flex;gap:8px;margin-top:4px}
+.add input{flex:1;min-width:0;font-size:14px;background:var(--bg);border:1.5px dashed var(--line);border-radius:12px;padding:10px 14px;transition:border-color .2s}
+.add input:focus{border-color:var(--forest);background:var(--surface);outline:none}
+.add button{font-size:14px;font-weight:700;border:none;border-radius:12px;padding:0 16px;background:var(--accent-soft);color:var(--accent);cursor:pointer;transition:all .2s}
+.add button:hover{background:var(--accent);color:var(--on-forest)}
+.zfoot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.zone-new{border:2px dashed var(--line);border-radius:22px;background:var(--surface);color:var(--muted);font-size:16px;font-weight:700;padding:32px;cursor:pointer;min-height:130px;width:100%;transition:all .2s;display:grid;place-content:center;box-shadow:0 4px 16px rgba(34,48,42,.02)}
+.zone-new:hover{border-color:var(--forest);color:var(--forest);background:color-mix(in srgb,var(--forest) 4%,var(--surface));box-shadow:0 8px 24px rgba(44,108,166,.08)}
+
+/* 여행 기록 */
+.log{border-top:2.5px solid var(--forest);padding-top:28px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:24px 36px}
+.log h2{font-family:var(--f-display);font-weight:400;font-size:32px;margin:0;color:var(--forest)}
+.sync{font-size:13px;font-weight:600;color:var(--muted);margin-top:6px}
+.sync.ok{color:var(--forest)}
+.sync.err{color:var(--danger)}
+.stats{display:flex;gap:24px;margin-top:18px;flex-wrap:wrap;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:16px 20px}
+.stat .v{font-family:var(--f-mono);font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;color:var(--forest)}
+.stat .k{font-size:12.5px;font-weight:700;color:var(--muted);margin-top:2px}
+.log-form{display:flex;flex-direction:column;gap:12px;margin-top:20px;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 4px 16px rgba(34,48,42,.04)}
+.log-form textarea{background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;min-height:88px;resize:vertical;font-size:14.5px;transition:all .2s}
+.log-form textarea:focus{border-color:var(--forest);background:var(--surface);outline:none}
+.primary{font-size:15.5px;font-weight:700;border:none;border-radius:12px;padding:14px 20px;background:var(--forest);color:var(--on-forest);cursor:pointer;box-shadow:0 6px 18px rgba(44,108,166,.25);transition:all .2s}
+.primary:hover{background:color-mix(in srgb,var(--forest) 85%,black)}
+.primary:disabled{opacity:.6;cursor:wait}
+.msg{font-size:13.5px;font-weight:600;min-height:1em}
+.msg.err{color:var(--danger)}
+.often{font-size:13.5px;color:var(--muted);margin-top:16px;background:var(--surface);padding:14px 18px;border-radius:14px;border:1.5px solid var(--line);line-height:1.5}
+.often b{color:var(--ink);font-weight:700}
+
+.records{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.records li{display:block;border:1.5px solid var(--line);border-radius:18px;background:var(--surface);padding:0;box-shadow:0 3px 12px rgba(34,48,42,.03);overflow:hidden;transition:border-color .2s}
+.records li:hover{border-color:color-mix(in srgb,var(--forest) 40%,var(--line))}
+.records summary{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 16px;align-items:center;padding:16px 20px;cursor:pointer;list-style:none}
+.records summary::-webkit-details-marker{display:none}
+.rdate{font-family:var(--f-mono);font-size:13.5px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.rplace{font-weight:700;font-size:16px;overflow-wrap:anywhere;color:var(--ink)}
+.rmeta{font-size:13px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;background:var(--bg);padding:4px 10px;border-radius:8px;border:1.5px solid var(--line)}
+.rbody{padding:0 20px 20px;font-size:14px;display:flex;flex-direction:column;gap:10px;color:var(--muted);border-top:1px dashed var(--line);margin-top:4px;padding-top:14px}
+.rbody p{margin:0;line-height:1.5}
+.rbody b{color:var(--ink);font-weight:700}
+.no-rec{font-size:15px;color:var(--muted);border:2px dashed var(--line);border-radius:18px;padding:32px;text-align:center;background:var(--surface);font-weight:600}
+
+.sync-row{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+.conn{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;max-width:640px;box-shadow:0 4px 16px rgba(34,48,42,.04)}
+.conn h3{font-family:var(--f-body);font-weight:700;font-size:20px;margin:0;color:var(--forest)}
+.conn p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.5}
+.conn label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--muted)}
+.conn .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.share{display:flex;flex-direction:column;gap:10px;border-top:1.5px dashed var(--line);padding-top:16px}
+.share .row .field{flex:1;min-width:0;font-size:14px}
+.install{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;justify-content:space-between;background:var(--forest);color:var(--on-forest);border-radius:18px;padding:16px 20px;box-shadow:0 8px 24px rgba(44,108,166,.2)}
+.install p{margin:0;font-size:14.5px;font-weight:600}
+.install .btns{display:flex;gap:10px}
+.install button{font-size:13.5px;font-weight:700;border-radius:10px;padding:9px 16px;cursor:pointer;border:1.5px solid var(--on-forest);background:transparent;color:var(--on-forest);transition:all .2s}
+.install button.go{background:var(--on-forest);color:var(--forest)}
+.install button.go:hover{background:color-mix(in srgb,var(--on-forest) 90%,transparent)}
+.acct{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:13.5px;font-weight:600;color:var(--muted);border:1.5px solid var(--line);background:var(--surface);border-radius:16px;padding:12px 18px;box-shadow:0 3px 12px rgba(34,48,42,.03)}
+.acct b{color:var(--ink);font-weight:700}
+.acct .dot{width:9px;height:9px;border-radius:50%;background:var(--done);flex:none}
+.acct .dot.on{background:var(--tree);box-shadow:0 0 8px var(--tree)}
+.acct .dot.off{background:var(--accent)}
+.acct .who{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.acct .grow{flex:1}
+.gbtn{display:inline-flex;align-items:center;gap:10px;font-size:14.5px;font-weight:700;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:all .2s}
+.gbtn:hover{border-color:var(--forest);background:var(--bg)}
+.fam{background:var(--surface);border:2px solid var(--forest);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 24px rgba(44,108,166,.08)}
+.fam h3{font-family:var(--f-body);font-weight:700;font-size:21px;margin:0;color:var(--forest)}
+.fam p{margin:0;font-size:14px;color:var(--muted);line-height:1.5}
+.fam .row{display:flex;gap:10px;flex-wrap:wrap}
+.fam .row .field{flex:1 1 220px;min-width:0}
+.members{display:flex;gap:6px;flex-wrap:wrap}
+.member{font-size:12.5px;border-radius:99px;padding:3px 10px;background:var(--accent-soft);color:var(--accent);font-weight:700;border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.place-field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--muted);min-width:0;position:relative}
+.place-list{position:absolute;left:0;right:0;top:100%;margin-top:6px;z-index:30;list-style:none;padding:6px;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;box-shadow:0 16px 40px rgba(34,48,42,.15);max-height:320px;overflow-y:auto}
+.place-list li{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;cursor:pointer;border:none}
+.place-list li[aria-selected="true"],.place-list li:hover{background:var(--accent-soft)}
+.place-list .pn{font-size:14.5px;color:var(--ink);font-weight:700}
+.place-list .pa{font-size:12.5px;color:var(--muted)}
+.place-list .pb{font-size:11.5px;color:var(--accent);font-weight:700}
+.place-list .phead{font-size:11.5px;font-weight:700;color:var(--muted);padding:6px 10px 4px;cursor:default;background:transparent!important}
+.place-links{display:flex;gap:10px;font-size:12.5px;font-weight:600;min-height:0;margin-top:2px}
+.place-links a{color:var(--forest);text-underline-offset:4px}
+.stars{display:inline-flex;gap:3px}
+.star{position:relative;border:none;background:none;padding:2px;cursor:pointer;font-size:28px;line-height:1;display:inline-block;transition:transform .1s}
+.star:active{transform:scale(1.15)}
+.star .s-bg{color:var(--done);opacity:.45}
+.star .s-fg{position:absolute;left:2px;top:2px;overflow:hidden;white-space:nowrap;color:var(--star);pointer-events:none}
+.star:hover .s-bg{color:var(--accent-soft)}
+.stars.sm .star{font-size:23px}
+.rate-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.rstar{color:var(--accent);font-weight:700;white-space:nowrap}
+.ranking{margin-top:18px;display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:16px 20px}
+.ranking h3{font-size:15px;margin:0;color:var(--ink);font-weight:700}
+.ranking ol{margin:0;padding-left:20px;font-size:13.5px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.ranking ol b{color:var(--ink);font-weight:700}
+.camper{font-size:12.5px;color:var(--muted);font-weight:600}
+.camper b{color:var(--accent)}
+.rbtns{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.redit-box{border:2px solid var(--accent)!important;padding:20px!important}
+.rform{display:flex;flex-direction:column;gap:14px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rgrid label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--muted);min-width:0}
+.rgrid .wide{grid-column:1/-1}
+.rgrid textarea{resize:vertical;font-size:14.5px}
+footer{font-size:13px;color:var(--muted);text-align:center;line-height:2.2;font-weight:600;margin-top:12px}
+footer a{color:var(--muted)}
+footer .link{font-size:13px}
+.mg-card{text-align:left;align-items:stretch;width:min(440px,100%);max-height:calc(100vh - 40px);overflow-y:auto}
+.mg-row{display:flex;gap:14px;align-items:center;justify-content:space-between;border-top:1px dashed var(--line);padding-top:14px}
+.mg-row > :first-child{min-width:0}
+.mg-row > :last-child{flex:none}
+.mg-row p{margin:3px 0 0;font-size:13px;color:var(--muted);line-height:1.4}
+.mg-row.danger{flex-direction:column;align-items:stretch}
+.mg-row.danger > div > b{color:var(--danger)}
+.mg-confirm{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--muted);margin-top:10px}
+.mg-confirm b{color:var(--danger)}
+.danger-btn{background:var(--danger)!important;font-size:14.5px;padding:12px 16px;box-shadow:0 4px 14px rgba(201,74,53,0.3)}
+.danger-btn:disabled{opacity:.45;cursor:not-allowed}
+a.chip{text-decoration:none;display:inline-block}
+
+@media (max-width:720px){
+  .trip{grid-template-columns:1fr 1fr}
+  .log{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  header{grid-template-columns:1fr;padding:0;border:none;background:none;box-shadow:none;border-radius:0}
+  .meter{text-align:left;display:grid;grid-template-columns:1fr auto;grid-template-areas:"num qr" "cap qr";align-items:center;column-gap:14px;padding:14px 16px}
+  .meter .num{grid-area:num}
+  .meter .cap{grid-area:cap}
+  .meter .qr-btn{grid-area:qr;margin:0;align-self:center}
+  .records summary{grid-template-columns:auto minmax(0,1fr)}
+  .rmeta{grid-column:1/-1}
+}
+.mobile-only,.tabbar,.write-head{display:none}
+.pane{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:20px;flex-direction:column;gap:14px;box-shadow:0 4px 16px rgba(34,48,42,.04)}
+.pane h2{font-family:var(--f-display);font-weight:400;font-size:27px;margin:0;color:var(--forest)}
+.set-row{display:flex;gap:14px;align-items:center;justify-content:space-between;border-top:1px dashed var(--line);padding-top:14px}
+.set-row p{margin:3px 0 0;font-size:13px;color:var(--muted);line-height:1.4}
+.fam-qr{background:#fff;border-radius:16px;padding:14px;width:min(240px,80%);align-self:center;box-shadow:inset 0 0 0 1px #E1ECE8}
+.fam-qr svg{display:block;width:100%;height:auto}
+@media (max-width:560px){
+  body{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+  body[data-tab="home"] .tabbed:not(.v-home),
+  body[data-tab="log"] .tabbed:not(.v-log),
+  body[data-tab="set"] .tabbed:not(.v-set){display:none!important}
+  body[data-tab="set"] #labelPanel{display:flex!important}
+  body[data-tab="set"] #lpClose{display:none}
+  body[data-tab="set"] #fam:not([hidden]){display:flex!important}
+  body[data-tab="set"] #acct{display:none!important}
+  body[data-tab="set"] #famTab{order:-3}
+  body[data-tab="set"] #fam{order:-2}
+  .mobile-only{display:flex}
+  /* 기록 탭: 이번 여행 기록하기 + 지난 기록이 한 화면에 */
+  body[data-tab="log"] .write-head{display:block}
+  body[data-tab="log"] .log{border-top:none;padding-top:0}
+  .log-form{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:18px}
+  .set-row > :last-child{white-space:nowrap;flex:none}
+  .write-head h3{font-family:var(--f-display);font-weight:400;font-size:23px;margin:0;color:var(--forest)}
+  .write-head p{margin:6px 0 0;font-size:13.5px;color:var(--muted);line-height:1.4}
+  /* 첫 화면 머리: 가운데 로고, 제목, 큰 숫자 카드 */
+  header{display:flex;flex-direction:column;align-items:stretch;gap:16px}
+  .brand{flex-direction:column;text-align:center;gap:12px}
+  .logo{width:100px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 4px var(--surface),0 6px 16px rgba(44,108,166,.18)}
+  .brand-text{display:flex;flex-direction:column-reverse;align-items:center;gap:4px}
+  .brand h1{font-size:31px;white-space:normal}
+  .meter{display:block;text-align:center;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 4px 16px rgba(34,48,42,.04)}
+  .meter .num{font-size:44px;line-height:1.1}
+  .meter .num small{font-size:22px}
+  .meter .cap{font-size:13.5px;margin-top:4px}
+  .meter .qr-btn{display:none}
+  .conn-foot{display:none}
+  .toast{bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+  /* 아래 탭 */
+  .tabbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;position:fixed;left:0;right:0;bottom:0;z-index:40;
+    background:var(--surface);border-top:1.5px solid var(--line);box-shadow:0 -8px 25px rgba(34,48,42,.08);
+    padding:8px max(12px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+  .tabbar button{border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;color:var(--muted);font:inherit;font-size:11.5px;font-weight:700;cursor:pointer;transition:color .2s}
+  .tabbar svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .tabbar button[aria-current="page"]{color:var(--forest)}
+  .tabbar button:not(.tab-main){position:relative;margin:0 12px;border-radius:14px;transition:background .2s,color .2s}
+  .tabbar button:not(.tab-main)[aria-current="page"]{background:color-mix(in srgb,var(--forest) 12%,transparent)}
+  .tabbar button:not(.tab-main)[aria-current="page"] svg{stroke-width:2.4}
+  .tabbar button:not(.tab-main)[aria-current="page"]::before{content:"";position:absolute;top:-8px;left:50%;width:26px;height:3px;margin-left:-13px;border-radius:0 0 3px 3px;background:var(--forest)}
+  .tabbar .tab-main{justify-self:center;width:68px;height:68px;border-radius:50%;background:var(--forest);color:var(--on-forest);margin:-32px 18px 0;justify-content:center;box-shadow:0 8px 20px rgba(44,108,166,.35);padding:0;font-size:12px;font-weight:700;transition:transform .15s}
+  .tabbar .tab-main:active{transform:scale(0.95)}
+  .tabbar .tab-main svg{width:28px;height:28px}
+  .tabbar .tab-main:not([aria-current]){background:var(--surface);color:var(--forest);border:2.5px solid var(--forest)}
+  .tabbar .tab-main[aria-current="page"]{color:var(--on-forest);outline:4px solid var(--accent-soft)}
+}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+.often:empty,.ranking:empty{display:none}
+@media (max-width:560px){.tools{padding:0;background:none;border:none;gap:8px}.trip{margin-top:0}.acct{padding:10px 14px;gap:6px 10px;font-size:13px}.acct .who{gap:6px}}
+
+/* 구역 접기 */
+.zfold{border:none;background:none;font:inherit;color:inherit;padding:0;margin:0;cursor:pointer;text-align:left;letter-spacing:inherit}
+.zone-head{cursor:pointer}
+.cnt.zfold{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.cnt .chev{transition:transform .2s;flex:none}
+.zone.folded .cnt .chev{transform:rotate(-90deg)}
+.zone.folded ul.items,.zone.folded .empty,.zone.folded .qadd{display:none}
+.zone.folded{gap:10px;padding-bottom:16px}
+
+/* 꼭 챙길 것 */
+li.imp{background:color-mix(in srgb,var(--accent) 8%,var(--surface));border-left:4px solid var(--accent);border-radius:6px 10px 10px 6px}
+li.imp .txt{font-weight:800;color:var(--ink)}
+.must{display:inline-block;flex:none;font-size:11.5px;font-weight:800;color:#fff;background:var(--accent);border-radius:99px;padding:2px 8px;white-space:nowrap}
+li.imp.on{background:transparent;border-left-color:transparent}
+li.imp.on .txt{font-weight:normal;color:var(--done)}
+li.imp.on .must{opacity:.4}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="tabbed v-home">
+    <div class="brand">
+      <img class="logo" src="logo.png" width="400" height="400" alt="트립첵! Trip-Check 로고">
+      <div class="brand-text">
+        <div class="eyebrow">Trip-Check · 트립첵!</div>
+        <h1>가족 여행 체크리스트</h1>
+      </div>
+    </div>
+    <div class="meter">
+      <button class="qr-btn" id="qrBtn" aria-haspopup="dialog"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3 3h5v5H3zM12 3h5v5h-5zM3 12h5v5H3z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 12h2v2h-2zM15 15h2v2h-2zM15 12h2v2h-2zM12 15h2v2h-2z" fill="currentColor"/></svg>가족 초대 QR</button>
+      <div class="num" id="totalNum">0<small> / 0</small></div>
+      <div class="cap" id="totalCap">챙긴 짐</div>
+    </div>
+    <div class="trip">
+      <label>출발일<input class="field" id="tripStart" type="date"></label>
+      <label>몇 박<input class="field" id="tripNights" type="number" min="0" max="30" inputmode="numeric" placeholder="1"></label>
+      <div class="place-field"><label for="tripPlace">여행지</label>
+        <input class="field" id="tripPlace" type="text" placeholder="예: 제주, 오사카" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="placeList">
+        <ul class="place-list" id="placeList" role="listbox" hidden></ul>
+        <span class="place-links" id="placeLinks"></span></div>
+      <label>교통편<input class="field" id="tripTemp" type="text" placeholder="예: 비행기, KTX"></label>
+    </div>
+  </header>
+
+  <div class="acct tabbed v-home v-set" id="acct"><span class="dot" id="acctDot"></span><span id="acctText">불러오는 중…</span><span class="grow"></span><span id="acctBtns"></span></div>
+
+  <section class="fam tabbed v-home v-set" id="fam" hidden aria-labelledby="famTitle">
+    <h3 id="famTitle">가족 공간 만들기</h3>
+    <p id="famText">가족 공간을 만들면 이 목록이 거기로 올라가고, 가족을 QR로 초대해 함께 체크할 수 있어요.</p>
+    <div class="row" id="famCreateRow"><input class="field" id="famName" type="text" value="우리 가족 여행" aria-label="가족 공간 이름"><button class="primary" id="famCreate">만들기</button></div>
+    <p id="famHint">가족에게 초대받았다면, 가족이 보여 주는 QR을 찍거나 보내 준 링크를 열어 주세요.</p>
+    <div class="msg" id="famMsg" aria-live="polite"></div>
+  </section>
+
+  <div class="install tabbed v-home v-set" id="install" hidden>
+    <p id="installText">휴대폰에 앱으로 설치하면 아이콘을 눌러 바로 열 수 있어요.</p>
+    <div class="btns"><button class="go" id="installGo">앱으로 설치</button><button id="installLater">나중에</button></div>
+  </div>
+
+  <div class="bar tabbed v-home" id="totalBar"><i></i></div>
+
+  <div class="tools tabbed v-home">
+    <span class="chips" id="labelChips"></span>
+    <button class="chip ghost" id="labelSet" aria-expanded="false">상황 설정</button>
+    <button class="chip" id="fHide" aria-pressed="false">챙긴 것 숨기기</button>
+    <span class="spacer"></span>
+    <span id="resetBox"></span>
+  </div>
+
+  <section class="labels-panel tabbed v-home v-set" id="labelPanel" hidden aria-labelledby="lpTitle">
+    <div class="lp-head"><h3 id="lpTitle">상황 설정</h3><button class="link" id="lpClose">닫기</button></div>
+    <p>상황을 만들고, 항목이나 구역 옆 연필을 눌러 그 상황을 붙여 주세요. 위 버튼에서 상황을 끄면 그 상황이 붙은 것들이 숨겨져요. 상황이 여러 개 붙은 항목은 하나라도 켜져 있으면 보여요.</p>
+    <ul class="lp-list" id="lpList"></ul>
+    <form class="add" id="lpAdd"><input id="lpNew" type="text" placeholder="예: 비 올 때, 아이와 함께, 바닷가" aria-label="새 상황 이름"><button type="submit">상황 추가</button></form>
+  </section>
+
+  <main class="grid tabbed v-home" id="grid"></main>
+  <div class="list-foot tabbed v-home"><span id="defaultBox"></span></div>
+
+  <section class="log tabbed v-log" aria-labelledby="logTitle">
+    <div>
+      <h2 id="logTitle">여행 기록</h2>
+      <div class="sync-row"><span class="sync" id="sync">불러오는 중…</span></div>
+      <div class="stats" id="stats"></div>
+      <div class="log-form">
+        <div class="write-head"><h3>이번 여행 기록하기</h3><p id="writeTrip"></p></div>
+        <div class="rate-row"><span>이번 여행지 우리 별점</span><span class="stars" id="tripStars"></span></div>
+        <textarea id="memo" placeholder="한 줄 메모: 날씨, 좋았던 점, 다음에 챙길 것"></textarea>
+        <button class="primary" id="saveRec">이번 여행 기록하기</button>
+        <div class="msg" id="recMsg" aria-live="polite"></div>
+      </div>
+      <div class="often" id="often"></div>
+      <div class="ranking" id="ranking"></div>
+    </div>
+    <ol class="records" id="records"></ol>
+  </section>
+
+  <section class="pane tabbed v-set mobile-only" id="famTab" aria-labelledby="famTabTitle">
+    <h2 id="famTabTitle">가족</h2>
+    <div id="famTabBody"></div>
+  </section>
+
+  <section class="pane tabbed v-set mobile-only" id="setTab" aria-labelledby="setTabTitle">
+    <h2 id="setTabTitle">설정</h2>
+    <div class="set-row"><div><b>처음 목록으로 되돌리기</b><p>고친 구역·항목을 모두 처음 목록으로 바꿔요.</p></div><span id="defaultBox2"></span></div>
+    <div class="set-row"><div><b>계정·자료 관리</b><p>기록 내려받기, 가족 공간에서 나가기, 계정 지우기</p></div><button class="chip" id="manageSet">열기</button></div>
+    <div class="set-row"><div><b>개인정보처리방침</b><p>어떤 정보를 어디에 두는지 알려 드려요.</p></div><a class="chip" href="privacy.html">보기</a></div>
+    <div class="set-row"><div><b>앱으로 설치하기</b><p>홈 화면에 트립첵! 아이콘을 만들어요.</p></div><button class="chip" id="installSet">설치 방법</button></div>
+  </section>
+
+  <div class="conn-foot"><button class="link" id="installAny" hidden>앱으로 설치하기</button></div>
+  <footer id="foot"><a href="privacy.html">개인정보처리방침</a> · <button class="link" id="acctManage">계정·자료 관리</button><br>Made by 음악적체육인</footer>
+
+  <div class="qr-modal" id="manage" hidden>
+    <div class="qr-card mg-card" role="dialog" aria-modal="true" aria-labelledby="mgTitle">
+      <h3 id="mgTitle">계정·자료 관리</h3>
+      <div class="mg-row"><div><b>여행 기록 내려받기</b><p>엑셀에서 열리는 파일로 받아요.</p></div><button class="chip" id="mgCsv">내려받기</button></div>
+      <div class="mg-row" id="mgLeaveRow"><div><b>가족 공간에서 나가기</b><p id="mgLeaveText">나만 빠지고 남은 가족의 자료는 그대로예요.</p></div><span id="mgLeaveBox"></span></div>
+      <div class="mg-row danger" id="mgDelRow"><div><b>트립첵! 자료 모두 지우기</b><p id="mgDelText">가족 공간에서 나간 뒤 트립첵! 자료를 지워요. 되살릴 수 없어요.</p>
+        <label class="mg-confirm"><span>확인을 위해 <b>지우기</b>라고 적어 주세요</span><input class="field" id="mgDelInput" autocomplete="off" aria-label="지우기라고 적기"></label></div>
+        <button class="primary danger-btn" id="mgDel" disabled>모두 지우기</button></div>
+      <p class="msg" id="mgMsg" aria-live="polite"></p>
+      <div class="row"><a href="privacy.html" class="link">개인정보처리방침 보기</a><button class="chip" id="mgClose">닫기</button></div>
+    </div>
+  </div>
+
+  <nav class="tabbar" aria-label="메뉴">
+    <button data-tab="log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>기록</span></button>
+    <button data-tab="home" class="tab-main" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v8.5a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H5.5A1.5 1.5 0 0 1 4 19.5z"/></svg><span>체크</span></button>
+    <button data-tab="set"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg><span>설정·가족</span></button>
+  </nav>
+
+  <div class="qr-modal" id="qrModal" hidden>
+    <div class="qr-card" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+      <h3 id="qrTitle">가족 초대 QR</h3>
+      <p id="qrText">휴대폰 카메라로 찍으면 우리 가족 트립첵!이 열려요.</p>
+      <div class="qr-box" id="qrBox"></div>
+      <p class="warn" id="qrWarn">이 QR로 들어온 사람은 가족 공간을 함께 쓰게 돼요. 가족에게만 보여 주세요.</p>
+      <div class="row"><button class="chip" id="qrCopy">링크 복사</button><button class="chip" id="qrClose">닫기</button></div>
+      <p id="qrMsg" aria-live="polite"></p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<script>
+/* ---------- 기본 목록 ---------- */
+const DEFAULT_ZONES = [
+  {key:"docs", name:"서류 · 돈", sub:"이것만 있으면 어떻게든 된다", items:[
+    ["신분증","",1],["여권","abroad",1],["여권 사본 · 증명사진","abroad"],"항공권 · 승차권 예약 확인","숙소 예약 확인","카드 · 현금",["환전한 돈 · 트래블카드","abroad"],["여행자 보험","abroad"],["국제운전면허증","abroad"]]},
+  {key:"device", name:"전자기기", sub:"충전은 미리미리", items:[
+    ["휴대폰 충전기","",1],"보조배터리",["멀티 어댑터(돼지코)","abroad"],["유심 · eSIM · 포켓 와이파이","abroad"],"이어폰","카메라 · 메모리카드"]},
+  {key:"clothes", name:"옷 · 신발", sub:"날씨 보고 한 번 더", items:[
+    "속옷 · 양말","잠옷","외출복","겉옷 · 가디건",["수영복 · 래시가드","water"],["두꺼운 외투","cold"],"편한 신발 · 슬리퍼","모자 · 선글라스"]},
+  {key:"wash", name:"세면 · 화장", sub:"작은 통에 덜어서", items:[
+    "칫솔 · 치약","샴푸 · 바디워시","화장품 · 클렌징","선크림","빗 · 머리끈","면도기","수건"]},
+  {key:"med", name:"상비약", sub:"아플 때 찾으면 늦다", items:[
+    "해열 · 진통제","소화제 · 지사제","밴드 · 연고","멀미약","개인 복용약","모기 기피제"]},
+  {key:"kids", name:"아이 물건", sub:"아이 짐이 제일 많다", g:["kids"], items:[
+    "아이 옷 여벌","물티슈 · 손수건","간식 · 물병","장난감 · 책","아이 상비약","유모차 · 아기띠"]},
+  {key:"plane", name:"기내 · 이동", sub:"가는 길도 여행", g:["plane"], items:[
+    "목베개","기내용 작은 가방","귀마개 · 안대","볼펜(입국신고서)","액체류 지퍼백(100ml)"]},
+  {key:"home", name:"떠나기 전 집", sub:"문 닫기 전에 한 바퀴", items:[
+    ["가스 밸브 잠그기","",1],"창문 · 문단속","냉장고 음식 정리","쓰레기 버리기","화분 물 주기","반려동물 맡기기"]}
+];
+/* 상황: 버튼으로 켜고 끄는 조건. 항목이나 구역에 붙이면, 그 상황이 꺼질 때 숨겨짐 */
+const DEFAULT_LABELS = [{id:"abroad", name:"해외", on:true}, {id:"plane", name:"비행기", on:true}, {id:"kids", name:"아이와 함께", on:true}, {id:"water", name:"물놀이", on:false}, {id:"cold", name:"추울 때", on:false}];
+const itemFrom = (zk, it, i) => Array.isArray(it) ? Object.assign({id:zk+"-"+i, t:it[0], g:it[1]?[it[1]]:[]}, it[2]?{imp:true}:{}) : {id:zk+"-"+i, t:it, g:[]};
+function defaultZones(){
+  return DEFAULT_ZONES.map(z => ({id:z.key, name:z.name, sub:z.sub, g:(z.g||[]).slice(),
+    items:z.items.map((it,i) => itemFrom(z.key, it, i))}));
+}
+/* 예전 저장 형식(추울 때 c, 차박 tag)을 상황 방식으로 바꿈 */
+function normalize(){
+  const f = state.f || {};
+  if (!Array.isArray(state.labels)){
+    state.labels = DEFAULT_LABELS.map(l => Object.assign({}, l, l.id === "car" ? {on:f.car !== false} : l.id === "cold" ? {on:f.cold !== false} : {}));
+    DEFAULT_ZONES.forEach(dz => {
+      const z = state.zones.find(x => x.id === dz.key); if (!z) return;
+      dz.items.forEach((it,i) => {
+        if (Array.isArray(it) && it[1] === "hot" && !z.items.some(x => x.t === it[0])) z.items.push(itemFrom(dz.key, it, i));
+      });
+    });
+  }
+  state.zones.forEach(z => {
+    if (!Array.isArray(z.g)) z.g = z.tag === "car" ? ["car"] : [];
+    delete z.tag;
+    z.items.forEach(i => { if (!Array.isArray(i.g)) i.g = i.c ? ["cold"] : []; delete i.c; });
+  });
+  state.f = {hide: !!f.hide};
+}
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- 저장소: 파이어베이스(가족 공간) 또는 이 기기 ----------
+   파이어베이스 쪽 일은 아래 type="module" 스크립트가 맡고, window.REMOTE 로 연결됨 */
+const KEY = "tripfb-checklist-v1", RKEY = "tripfb-records-v1";
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+let REMOTE = null;            // 가족 공간에 들어가 있으면 {saveSettings, check, clearChecks, addRecord, deleteRecord}
+let FAMILY = null;            // {id, name, members:[{uid,name}], invite}
+const sortRecs = l => l.sort((a,b) => (b.date+b.saved).localeCompare(a.date+a.saved));
+const local = {
+  getData(){ let r=[]; try{ r = JSON.parse(lsGet(RKEY)||"[]"); }catch(e){} return {settings:lsGet(KEY)||"", records:sortRecs(r)}; },
+  saveRecord(rec){
+    const l = local.getData().records;
+    l.push(Object.assign({}, rec, {id:uid(), saved:nowText()}));
+    lsSet(RKEY, JSON.stringify(l)); return sortRecs(l);
+  },
+  deleteRecord(id){ const l = local.getData().records.filter(r => r.id !== id); lsSet(RKEY, JSON.stringify(l)); return l; },
+  updateRecord(a){ const f = a.fields || {rating:a.rating}; const l = local.getData().records.map(r => r.id === a.id ? Object.assign({}, r, f) : r); lsSet(RKEY, JSON.stringify(l)); return sortRecs(l); }
+};
+function nowText(){ const d = new Date(), p = n => String(n).padStart(2,"0"); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; }
+async function call(fn, arg){
+  if (!REMOTE) return local[fn](arg);
+  if (fn === "getData") return {settings:"", records};
+  if (fn === "saveRecord"){ await REMOTE.addRecord(Object.assign({}, arg, {saved:nowText()})); return records; }
+  if (fn === "deleteRecord"){ await REMOTE.deleteRecord(arg); return records.filter(r => r.id !== arg); }
+  if (fn === "updateRecord"){ const f = arg.fields || {rating:arg.rating}; await REMOTE.updateRecord(arg.id, f); return records.map(r => r.id === arg.id ? Object.assign({}, r, f) : r); }
+}
+let pending = 0;
+function track(p){
+  pending++;
+  return Promise.resolve(p).then(() => { pending--; showConnState(); })
+    .catch(err => { pending--; setSync("저장하지 못했어요. " + (err && err.message || "잠시 뒤 다시 해 보세요."), "err"); });
+}
+/* ---------- 상태 ---------- */
+let state = {zones:defaultZones(), labels:DEFAULT_LABELS.map(l => Object.assign({}, l)), checked:{}, trip:{}, memo:"", f:{hide:false}};
+let records = [];
+function applySettings(json){
+  if (!json) return;
+  try{
+    const s = JSON.parse(json);
+    if (s && Array.isArray(s.zones)){ state = Object.assign(state, s); state.checked = s.checked || {}; if (!Array.isArray(s.labels)) delete state.labels; }
+    else if (s && s.checked) state.checked = s.checked;
+  }catch(e){}
+  normalize();
+}
+applySettings(local.getData().settings);
+
+function settingsObj(){   // 가족 공간에 올리는 목록·여행 정보 (체크는 한 칸씩 따로)
+  return JSON.parse(JSON.stringify({zones:state.zones, labels:state.labels, trip:state.trip, memo:state.memo, f:state.f}));
+}
+let saveTimer = null;
+function save(){
+  lsSet(KEY, JSON.stringify(state));
+  if (!REMOTE) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => { saveTimer = null; incoming = null; track(REMOTE.saveSettings(settingsObj())); }, 700);   // 내 저장이 나가면 기다리던 옛 내용은 버림(곧 새 내용이 옴)
+}
+/* 체크는 한 칸씩 보내서, 두 사람이 동시에 체크해도 서로 지우지 않게 */
+function setCheck(id, on){
+  lsSet(KEY, JSON.stringify(state));
+  if (REMOTE) track(REMOTE.check(id, on));
+}
+function clearChecks(){
+  state.checked = {};
+  lsSet(KEY, JSON.stringify(state));
+  if (REMOTE) track(REMOTE.clearChecks());
+}
+function setSync(text, cls){ const el = document.getElementById("sync"); el.textContent = text; el.className = "sync" + (cls ? " "+cls : ""); }
+
+/* ---------- 체크리스트 그리기 ---------- */
+const findLabel = id => state.labels.find(l => l.id === id);
+const labelOn = id => { const l = findLabel(id); return !l || l.on !== false; };
+const visible = g => !g || !g.length || g.some(labelOn);   // 붙은 상황 중 하나라도 켜져 있으면 보임
+const editingNow = (type, id) => quick && quick.type === type && quick.id === id;
+function shownItems(z){
+  if (!visible(z.g) && !editingNow("zone", z.id) && !z.items.some(i => editingNow("item", i.id))) return null;
+  return z.items.filter(it => visible(it.g) || editingNow("item", it.id));   // 고치는 중인 것은 저장 전까지 그대로 보임
+}
+const badges = (g, cls) => (g||[]).map(findLabel).filter(Boolean).map(l => `<span class="${cls}">${esc(l.name)}</span>`).join("");
+const labelToggles = (z, i) => state.labels.map(l => {
+  const on = ((quick && quick.g) || (i || z).g || []).includes(l.id);
+  return `<button type="button" class="ctog" data-z="${z.id}" ${i?`data-i="${i.id}"`:""} data-l="${l.id}" aria-pressed="${on}">${esc(l.name)}</button>`;
+}).join("");
+function countAll(){
+  let tot = 0, got = 0;
+  state.zones.forEach(z => { const it = shownItems(z); if (!it) return; tot += it.length; got += it.filter(i => state.checked[i.id]).length; });
+  return {tot, got};
+}
+
+const PENCIL = '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M13.6 3.2a1.6 1.6 0 0 1 2.3 0l.9.9a1.6 1.6 0 0 1 0 2.3L7.4 15.8l-3.6.9.9-3.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12.2 4.6l3.2 3.2" stroke="currentColor" stroke-width="1.6"/></svg>';
+let quick = null; // 지금 연필로 고치는 것: {type:"item"|"zone", id}
+let askDel = null; // 휴지통을 눌러 한 번 더 묻는 중인 항목 id
+const TRASH = '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M4 6h12M8 6V4.5h4V6M5.5 6l.8 10h7.4l.8-10M8.5 9v4.5M11.5 9v4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function itemRow(z, i){
+  if (quick && quick.type === "item" && quick.id === i.id){
+    return `<li class="qrow"><form class="qedit" data-z="${z.id}" data-i="${i.id}">
+      <input class="qinput" id="q-${i.id}" value="${esc(quick.t ?? i.t)}" aria-label="항목 이름 고치기">
+      <button type="submit" class="qsave">저장</button>
+      <div class="qlabels"><span>강조</span><button type="button" class="ctog qimp" aria-pressed="${!!quick.imp}">꼭 챙기기</button></div>
+      <div class="qlabels"><span>상황</span>${labelToggles(z, i)}</div>
+      <div class="qlabels qplace"><span>구역 옮기기</span>
+        <select class="qzsel" data-z="${z.id}" data-i="${i.id}" aria-label="다른 구역으로 옮기기">${state.zones.map(x => `<option value="${x.id}" ${x.id===z.id?"selected":""}>${x.id===z.id?"구역: ":"→ "}${esc(x.name)}</option>`).join("")}</select></div>
+      <button type="button" class="qcancel" aria-label="고치기 취소">취소</button></form></li>`;
+  }
+  if (askDel === i.id){
+    return `<li class="askdel"><span class="txt">${esc(i.t)}</span><span class="confirm">목록에서 뺄까요?
+      <button class="yes tyes" data-z="${z.id}" data-i="${i.id}">빼기</button><button class="tno">취소</button></span></li>`;
+  }
+  return `<li class="${state.checked[i.id]?"on":""}${i.imp?" imp":""}" data-i="${i.id}">
+    <span class="grip" aria-hidden="true" title="눌러서 끌면 순서가 바뀌어요"><svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><g fill="currentColor"><circle cx="7" cy="5" r="1.5"/><circle cx="13" cy="5" r="1.5"/><circle cx="7" cy="10" r="1.5"/><circle cx="13" cy="10" r="1.5"/><circle cx="7" cy="15" r="1.5"/><circle cx="13" cy="15" r="1.5"/></g></svg></span>
+    <label><input type="checkbox" id="c-${i.id}" data-i="${i.id}" ${state.checked[i.id]?"checked":""}><span class="txt">${esc(i.t)}</span>${i.imp?'<span class="must">꼭!</span>':""}</label>
+    ${badges(i.g, "tag")}
+    <button class="pen" data-z="${z.id}" data-i="${i.id}" aria-label="${esc(i.t)} 고치기" title="고치기">${PENCIL}</button>
+    <button class="pen trash" data-z="${z.id}" data-i="${i.id}" aria-label="${esc(i.t)} 빼기" title="빼기">${TRASH}</button></li>`;
+}
+
+/* 구역 접기 — 이 기기에서만 기억(가족과 나누지 않음) */
+const fold = new Set((() => { try{ return JSON.parse(lsGet("tripcheck-fold") || "[]"); }catch(e){ return []; } })());
+function toggleFold(id){ fold.has(id) ? fold.delete(id) : fold.add(id); lsSet("tripcheck-fold", JSON.stringify([...fold])); render(); const b = document.querySelector(`.zone[data-z="${id}"] .zfold`); if (b) b.focus({preventScroll:true}); }
+function zoneView(z){
+  const items = shownItems(z);
+  if (!items) return "";
+  const n = items.length, k = items.filter(i => state.checked[i.id]).length;
+  const full = n && k === n;
+  const head = quick && quick.type === "zone" && quick.id === z.id
+    ? `<form class="qzone" data-z="${z.id}">
+        <input class="zname" id="qz-${z.id}" value="${esc(quick.name ?? z.name)}" placeholder="구역 이름" aria-label="구역 이름">
+        <input class="zsub" id="qs-${z.id}" value="${esc(quick.sub ?? (z.sub||""))}" placeholder="한 줄 설명(비워도 돼요)" aria-label="구역 설명">
+        <div class="qlabels"><span>구역 전체 상황</span>${labelToggles(z)}</div>
+        <div class="qbtns"><button type="submit" class="qsave">저장</button><button type="button" class="qcancel">취소</button>
+          <span class="spacer"></span><span id="zd-${z.id}"><button type="button" class="link warn zdel" data-z="${z.id}">구역 삭제</button></span></div></form>`
+    : `<div class="zone-head"><span class="grip zgrip" aria-hidden="true" title="눌러서 끌면 구역 순서가 바뀌어요"><svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><g fill="currentColor"><circle cx="7" cy="5" r="1.5"/><circle cx="13" cy="5" r="1.5"/><circle cx="7" cy="10" r="1.5"/><circle cx="13" cy="10" r="1.5"/><circle cx="7" cy="15" r="1.5"/><circle cx="13" cy="15" r="1.5"/></g></svg></span><div class="zh-text"><h2><button type="button" class="zfold" data-z="${z.id}" aria-expanded="${!fold.has(z.id)}" title="눌러서 접기·펴기">${esc(z.name)}</button>${badges(z.g, "ztag")}<button class="pen pen-z" data-z="${z.id}" aria-label="${esc(z.name)} 구역 이름 고치기" title="구역 이름 고치기">${PENCIL}</button></h2>${z.sub?`<div class="sub">${esc(z.sub)}</div>`:""}</div>
+      <button type="button" class="cnt zfold" data-z="${z.id}" aria-expanded="${!fold.has(z.id)}" aria-label="${esc(z.name)} 접기·펴기">${full?"다 챙김 ":""}${k} / ${n}<svg class="chev" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`;
+  const folded = fold.has(z.id) && !(quick && quick.type === "zone" && quick.id === z.id) && !(quick && z.items.some(i => i.id === quick.id));
+  return `<section class="zone${full?" complete":""}${folded?" folded":""}" data-z="${z.id}">
+    ${head}
+    <div class="bar${full?" full":""}"><i style="width:${n?k/n*100:0}%"></i></div>
+    <ul class="items" data-z="${z.id}">${items.map(i => itemRow(z, i)).join("")}</ul>
+    ${n ? "" : `<div class="empty">항목이 없어요. 아래 칸에서 넣거나 다른 구역 항목을 끌어다 놓으세요.</div>`}
+    <form class="add qadd" data-z="${z.id}"><input id="add-${z.id}" type="text" placeholder="+ 항목 넣기" aria-label="${esc(z.name)}에 항목 넣기"><button type="submit">넣기</button></form>
+  </section>`;
+}
+function openQuick(type, id){
+  const target = type === "item" ? state.zones.flatMap(z => z.items).find(i => i.id === id) : findZone(id);
+  quick = {type, id, g:((target && target.g) || []).slice(), imp:!!(target && target.imp)}; render();   // 상황은 저장을 눌러야 반영
+  const el = document.getElementById((type === "item" ? "q-" : "qz-") + id);
+  if (el){ el.focus(); el.select(); }
+}
+function closeQuick(){ quick = null; render(); }
+
+
+function render(){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = state.zones.map(zoneView).join("") + '<button class="zone-new" id="zoneNew">+ 구역 추가</button>';
+  setupDrag();
+  document.body.classList.toggle("hide-done", state.f.hide);
+
+  const {tot, got} = countAll();
+  document.getElementById("totalNum").innerHTML = `${got}<small> / ${tot}</small>`;
+  document.getElementById("totalCap").textContent = tot && got === tot ? "출발 준비 끝" : `챙긴 짐 · 남은 ${tot-got}개`;
+  const tb = document.getElementById("totalBar");
+  tb.querySelector("i").style.width = (tot ? got/tot*100 : 0) + "%";
+  tb.classList.toggle("full", tot > 0 && got === tot);
+  document.getElementById("fHide").setAttribute("aria-pressed", state.f.hide);
+  renderChips();
+}
+function findZone(id){ return state.zones.find(z => z.id === id); }
+
+/* 잠깐 떴다 사라지는 안내 */
+let toastTimer = null;
+function toast(text){
+  let el = document.getElementById("toast");
+  if (!el){ el = document.createElement("div"); el.id = "toast"; el.className = "toast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
+  el.textContent = text; el.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, 4000);
+}
+
+/* ---------- 순서 옮기기 (지금 화면에 보이는 것 기준으로 한 칸씩) ---------- */
+function keepTyped(){
+  const f = document.querySelector(".qedit, .qzone"); if (!f) return;
+  const z = findZone(f.dataset.z); if (!z) return;
+  if (f.classList.contains("qedit")){ const it = z.items.find(i => i.id === f.dataset.i), v = f.querySelector(".qinput").value.trim(); if (it && v) it.t = v; }
+  else { const n = f.querySelector(".zname").value.trim(); if (n) z.name = n; z.sub = f.querySelector(".zsub").value.trim(); }
+}
+function shiftIn(arr, thing, seen, dir){
+  const pos = seen.indexOf(thing), nb = seen[pos + dir];
+  if (pos < 0 || !nb) return false;
+  arr.splice(arr.indexOf(thing), 1);
+  const at = arr.indexOf(nb);
+  arr.splice(dir < 0 ? at : at + 1, 0, thing);
+  return true;
+}
+function moveThing(zid, iid, dir){
+  keepTyped();
+  const z = findZone(zid);
+  const moved = iid
+    ? shiftIn(z.items, z.items.find(i => i.id === iid), shownItems(z) || [], dir)
+    : shiftIn(state.zones, z, state.zones.filter(x => shownItems(x)), dir);
+  if (moved) save();
+  render();
+  const b = document.querySelector(`.${dir < 0 ? "qup" : "qdown"}[data-z="${zid}"]${iid ? `[data-i="${iid}"]` : ""}`);
+  if (b){ b.focus(); b.closest("section").scrollIntoView && b.closest("section").scrollIntoView({block:"nearest"}); }
+}
+
+/* ---------- 끌어서 순서 바꾸기 (점 6개 손잡이) ---------- */
+let dragging = false, gridSort = null;
+/* 화면에 보이는 것들의 새 순서로 배열을 다시 짜되, 숨겨진 것은 바로 앞에 있던 것 뒤에 붙여서 같이 다님 */
+function reorder(arr, keyOf, newIds, extra){
+  const shown = new Set(newIds), lead = [], groups = {};
+  let cur = null;
+  arr.forEach(x => { const k = keyOf(x); if (shown.has(k)){ cur = k; groups[k] = [x]; } else if (cur) groups[cur].push(x); else lead.push(x); });
+  if (extra) groups[keyOf(extra)] = [extra];
+  return lead.concat(...newIds.map(k => groups[k] || []));
+}
+function idsIn(el, sel, attr){ return [...el.querySelectorAll(sel)].map(x => x.dataset[attr]); }
+function setupDrag(){
+  if (!window.Sortable) return;
+  document.body.classList.add("can-drag");
+  const grid = document.getElementById("grid");
+  const opts = {animation:150, ghostClass:"drag-ghost", chosenClass:"drag-chosen", forceFallback:true, fallbackTolerance:3,
+    onStart(){ dragging = true; }, };
+  grid.querySelectorAll("ul.items").forEach(ul => Sortable.create(ul, Object.assign({}, opts, {
+    group:"items", handle:".grip", draggable:"li[data-i]",
+    onEnd(ev){
+      dragging = false;
+      const from = findZone(ev.from.dataset.z), to = findZone(ev.to.dataset.z), id = ev.item.dataset.i;
+      const it = from.items.find(i => i.id === id);
+      if (from === to){
+        if (ev.oldIndex !== ev.newIndex){ from.items = reorder(from.items, i => i.id, idsIn(ev.to, "li[data-i]", "i")); save(); }
+      } else if (it){
+        from.items = from.items.filter(i => i !== it);
+        to.items = reorder(to.items, i => i.id, idsIn(ev.to, "li[data-i]", "i"), it);
+        save();
+      }
+      render();
+    }
+  })));
+  if (gridSort) gridSort.destroy();
+  gridSort = Sortable.create(grid, Object.assign({}, opts, {
+    handle:".zgrip", draggable:"section.zone",
+    onEnd(ev){
+      dragging = false;
+      if (ev.oldIndex !== ev.newIndex){ state.zones = reorder(state.zones, z => z.id, idsIn(grid, "section.zone", "z")); save(); }
+      render();
+    }
+  }));
+}
+
+/* ---------- 체크리스트 동작 ---------- */
+const grid = document.getElementById("grid");
+grid.addEventListener("change", e => {
+  const t = e.target;
+  if (t.classList.contains("qzsel")){
+    keepTyped();
+    const from = findZone(t.dataset.z), to = findZone(t.value), it = from.items.find(i => i.id === t.dataset.i);
+    if (to && it && to !== from){ from.items = from.items.filter(i => i !== it); to.items.push(it); save(); quick = Object.assign({}, quick, {type:"item", id:it.id}); }
+    render();
+    const el = document.getElementById("q-"+t.dataset.i); if (el){ el.focus(); el.closest("section").scrollIntoView && el.closest("section").scrollIntoView({block:"nearest"}); }
+    return;
+  }
+  if (t.type === "checkbox" && t.dataset.i){
+    if (t.checked) state.checked[t.dataset.i] = 1; else delete state.checked[t.dataset.i];
+    setCheck(t.dataset.i, t.checked); render();
+    const el = document.getElementById("c-"+t.dataset.i); if (el) el.focus();
+  }
+});
+grid.addEventListener("input", e => {
+  const t = e.target, z = t.dataset.z && findZone(t.dataset.z);
+  if (!z) return;
+  if (t.dataset.f) z[t.dataset.f] = t.value;
+  else if (t.classList.contains("iname")){ const it = z.items.find(i => i.id === t.dataset.i); if (it) it.t = t.value; }
+  else return;
+  save();
+});
+grid.addEventListener("click", e => {
+  const t = e.target.closest("button");
+  if (!t){ const h = e.target.closest(".zone-head"); if (h && !e.target.closest(".grip")){ const zs = h.closest(".zone"); if (zs) toggleFold(zs.dataset.z); } return; }
+  if (t.classList.contains("zfold")){ toggleFold(t.dataset.z); return; }
+  if (t.classList.contains("trash")){ askDel = t.dataset.i; quick = null; render(); const y = document.querySelector(".tno"); if (y) y.focus(); return; }
+  if (t.classList.contains("tno")){ const id = askDel; askDel = null; render(); const b = document.querySelector(`.trash[data-i="${id}"]`); if (b) b.focus(); return; }
+  if (t.classList.contains("tyes")){
+    const qz = findZone(t.dataset.z);
+    qz.items = qz.items.filter(i => i.id !== t.dataset.i);
+    if (state.checked[t.dataset.i]){ delete state.checked[t.dataset.i]; setCheck(t.dataset.i, false); }
+    askDel = null; save(); render(); return;
+  }
+  if (t.classList.contains("pen")){ askDel = null; e.preventDefault(); openQuick(t.dataset.i ? "item" : "zone", t.dataset.i || t.dataset.z); return; }
+  if (t.classList.contains("qcancel")){ closeQuick(); return; }
+  if (t.classList.contains("qup") || t.classList.contains("qdown")){ moveThing(t.dataset.z, t.dataset.i, t.classList.contains("qup") ? -1 : 1); return; }
+  if (t.classList.contains("qdel")){
+    const qz = findZone(t.dataset.z);
+    qz.items = qz.items.filter(i => i.id !== t.dataset.i);
+    if (state.checked[t.dataset.i]){ delete state.checked[t.dataset.i]; setCheck(t.dataset.i, false); }
+    quick = null; save(); render(); return;
+  }
+  if (t.classList.contains("qimp") && quick){
+    const qi = document.querySelector(".qinput"); if (qi) quick.t = qi.value;   // 쓰던 글자 지키기
+    quick.imp = !quick.imp; render(); return;
+  }
+  if (t.id === "zoneNew"){
+    const z = {id:uid(), name:"새 구역", sub:"", g:[], items:[]};
+    state.zones.push(z); save(); openQuick("zone", z.id);
+    return;
+  }
+  const z = t.dataset.z && findZone(t.dataset.z); if (!z) return;
+  if (t.classList.contains("del")){
+    z.items = z.items.filter(i => i.id !== t.dataset.i); delete state.checked[t.dataset.i]; save(); render();
+  } else if (t.classList.contains("ctog")){
+    const l = t.dataset.l;
+    if (quick && quick.g){
+      const qi = document.querySelector(".qinput"), qn = document.querySelector(".qzone .zname"), qs = document.querySelector(".qzone .zsub");
+      if (qi) quick.t = qi.value; if (qn) quick.name = qn.value; if (qs) quick.sub = qs.value;   // 쓰던 글자 지키기
+      quick.g = quick.g.includes(l) ? quick.g.filter(x => x !== l) : quick.g.concat(l); render(); return; }
+    const target = t.dataset.i ? z.items.find(i => i.id === t.dataset.i) : z;
+    target.g = target.g.includes(l) ? target.g.filter(x => x !== l) : target.g.concat(l);
+    save(); render();
+  } else if (t.classList.contains("zdel")){
+    document.getElementById("zd-"+z.id).innerHTML =
+      `<span class="confirm">항목 ${z.items.length}개도 함께 지워져요. <button class="yes zdel-yes" data-z="${z.id}">삭제</button><button class="zdel-no" data-z="${z.id}">취소</button></span>`;
+  } else if (t.classList.contains("zdel-yes")){
+    z.items.forEach(i => delete state.checked[i.id]);
+    state.zones = state.zones.filter(x => x !== z); quick = null; save(); render();
+  } else if (t.classList.contains("zdel-no")){
+    document.getElementById("zd-"+z.id).innerHTML = `<button type="button" class="link warn zdel" data-z="${z.id}">구역 삭제</button>`;
+  }
+});
+grid.addEventListener("keydown", e => {
+  if (e.key === "Escape" && quick){ e.preventDefault(); closeQuick(); }
+});
+grid.addEventListener("submit", e => {
+  e.preventDefault();
+  const f = e.target;
+  if (f.classList.contains("qedit")){
+    const it = findZone(f.dataset.z).items.find(i => i.id === f.dataset.i), v = f.querySelector("input").value.trim();
+    if (it && v) it.t = v;
+    if (it && quick && quick.g) it.g = quick.g.slice();
+    if (it && quick){ if (quick.imp) it.imp = true; else delete it.imp; }
+    quick = null; save(); render();
+    const el = document.getElementById("c-"+f.dataset.i);
+    if (el) el.focus(); else if (it) toast(`"${it.t}"은(는) 지금 꺼진 상황이라 숨겨졌어요. 위에서 그 상황을 켜면 보여요.`);
+    return;
+  }
+  if (f.classList.contains("qzone")){
+    const qz = findZone(f.dataset.z), name = f.querySelector(".zname").value.trim();
+    if (name) qz.name = name;
+    qz.sub = f.querySelector(".zsub").value.trim();
+    if (quick && quick.g) qz.g = quick.g.slice();
+    quick = null; save(); render();
+    if (!visible(qz.g)) toast(`"${qz.name}" 구역은 지금 꺼진 상황이라 숨겨졌어요. 위에서 그 상황을 켜면 보여요.`);
+    return;
+  }
+  const z = findZone(f.dataset.z), inp = f.querySelector("input"), v = inp.value.trim();
+  if (!z || !v) return;
+  z.items.push({id:uid(), t:v, g:[]}); save(); render();
+  const again = document.getElementById("add-"+z.id); if (again) again.focus();
+});
+
+document.getElementById("fHide").addEventListener("click", () => { state.f.hide = !state.f.hide; save(); render(); });
+
+/* ---------- 상황 버튼 · 상황 설정 ---------- */
+function labelUse(id){
+  let n = 0; state.zones.forEach(z => { if (z.g.includes(id)) n++; z.items.forEach(i => { if (i.g.includes(id)) n++; }); }); return n;
+}
+function renderChips(){
+  document.getElementById("labelChips").innerHTML = state.labels.map(l =>
+    `<button class="chip lchip" data-l="${l.id}" aria-pressed="${l.on !== false}">${esc(l.name || "이름 없음")}</button>`).join("");
+  const panel = document.getElementById("labelPanel");
+  document.getElementById("labelSet").setAttribute("aria-expanded", !panel.hidden);
+  if (!panel.hidden && !(document.activeElement && document.activeElement.classList.contains("lname"))) renderLabelList();
+}
+function renderLabelList(){
+  document.getElementById("lpList").innerHTML = state.labels.length ? state.labels.map(l => `<li>
+    <input class="lname" id="ln-${l.id}" data-l="${l.id}" value="${esc(l.name)}" aria-label="상황 이름">
+    <span class="lcount">${labelUse(l.id)}곳에 붙음</span>
+    <span id="ld-${l.id}"><button class="link warn ldel" data-l="${l.id}">삭제</button></span></li>`).join("")
+    : '<li class="empty">상황이 없어요. 아래에서 만들어 보세요.</li>';
+}
+document.getElementById("labelChips").addEventListener("click", e => {
+  const b = e.target.closest(".lchip"); if (!b) return;
+  const l = findLabel(b.dataset.l); l.on = l.on === false; save(); render();
+});
+document.getElementById("labelSet").addEventListener("click", () => {
+  const p = document.getElementById("labelPanel"); p.hidden = !p.hidden; renderChips();
+  if (!p.hidden) document.getElementById("lpNew").focus();
+});
+document.getElementById("lpClose").addEventListener("click", () => { document.getElementById("labelPanel").hidden = true; render(); });
+const lpList = document.getElementById("lpList");
+lpList.addEventListener("input", e => {
+  const l = e.target.dataset.l && findLabel(e.target.dataset.l); if (!l) return;
+  l.name = e.target.value; save(); renderChips();
+});
+lpList.addEventListener("change", () => render());
+lpList.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const id = b.dataset.l;
+  if (b.classList.contains("ldel")){
+    const n = labelUse(id);
+    document.getElementById("ld-"+id).innerHTML = `<span class="confirm">${n ? n+"곳에서 떼어져요. " : ""}<button class="yes ldel-yes" data-l="${id}">삭제</button><button class="ldel-no" data-l="${id}">취소</button></span>`;
+  } else if (b.classList.contains("ldel-yes")){
+    state.labels = state.labels.filter(l => l.id !== id);
+    state.zones.forEach(z => { z.g = z.g.filter(x => x !== id); z.items.forEach(i => { i.g = i.g.filter(x => x !== id); }); });
+    save(); renderLabelList(); render();
+  } else if (b.classList.contains("ldel-no")){ renderLabelList(); }
+});
+document.getElementById("lpAdd").addEventListener("submit", e => {
+  e.preventDefault();
+  const inp = document.getElementById("lpNew"), v = inp.value.trim(); if (!v) return;
+  state.labels.push({id:uid(), name:v, on:true}); inp.value = ""; save(); renderLabelList(); render(); inp.focus();
+});
+
+/* 체크 지우기 / 기본 목록으로 */
+function twoStep(boxId, label, question, yesLabel, onYes){
+  const box = document.getElementById(boxId);
+  const idle = () => { box.innerHTML = `<button class="link">${label}</button>`; };
+  idle();
+  box.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.classList.contains("link")){
+      box.innerHTML = `<span class="confirm">${question} <button class="yes">${yesLabel}</button><button class="no">취소</button></span>`;
+      box.querySelector(".no").focus();
+    } else if (b.classList.contains("yes")){ onYes(); idle(); }
+    else idle();
+  });
+  return idle;
+}
+const resetIdle = twoStep("resetBox", "체크 모두 지우기", "체크를 모두 지울까요?", "지우기", () => { clearChecks(); render(); });
+twoStep("defaultBox", "처음 목록으로 되돌리기", "내가 고친 구역과 항목이 모두 처음 목록으로 바뀌어요.", "되돌리기",
+  () => { state.zones = defaultZones(); state.labels = DEFAULT_LABELS.map(l => Object.assign({}, l)); save(); clearChecks(); render(); });
+
+/* 여행 정보 */
+const TRIP = {tripStart:"start", tripNights:"nights", tripPlace:"place", tripTemp:"temp"};
+function fillTrip(){
+  Object.entries(TRIP).forEach(([id,k]) => { document.getElementById(id).value = state.trip[k] || ""; });
+  document.getElementById("memo").value = state.memo || "";
+  renderTripStars(); renderPlaceLinks();
+}
+Object.entries(TRIP).forEach(([id,k]) => document.getElementById(id).addEventListener("input", e => { state.trip[k] = e.target.value; save(); }));
+document.getElementById("memo").addEventListener("input", e => { state.memo = e.target.value; save(); });
+
+/* ---------- 여행지 찾기 · 우리 별점 ---------- */
+/* 별 하나의 왼쪽 반을 누르면 반 개, 오른쪽 반을 누르면 한 개 */
+function starsHTML(v, attrs, size){
+  v = Number(v) || 0;
+  return `<span class="stars ${size||""}" role="group" aria-label="별점 ${v ? v + "점" : "없음"}">${[1,2,3,4,5].map(n => {
+    const fill = v >= n ? 100 : v >= n - 0.5 ? 50 : 0;
+    return `<button type="button" class="star" ${attrs} data-v="${n}" aria-pressed="${fill > 0}" aria-label="별 ${n}개 (왼쪽 반은 ${n - 0.5}개)"><span class="s-bg" aria-hidden="true">★</span><span class="s-fg" aria-hidden="true" style="width:${fill}%">★</span></button>`;
+  }).join("")}</span>`;
+}
+function starValue(e, b){
+  const n = Number(b.dataset.v), r = b.getBoundingClientRect();
+  if (!r.width || e.detail === 0) return n;              // 키보드로 누르면 한 개 단위
+  return (e.clientX - r.left) < r.width / 2 ? n - 0.5 : n;
+}
+function placeLinksHTML(name, url){
+  const q = encodeURIComponent(name || "");
+  return `<a href="${esc(url || "https://map.kakao.com/link/search/" + q)}" target="_blank" rel="noopener">카카오맵</a> · <a href="https://map.naver.com/p/search/${q}" target="_blank" rel="noopener">네이버 지도</a>`;
+}
+/* 다녀온 곳마다 우리 평균 별점 */
+function placeKey(r){ return r.placeId || String(r.place || "").trim(); }
+function ourPlaces(){
+  const m = {};
+  records.forEach(r => {
+    const k = placeKey(r); if (!k) return;
+    const p = m[k] || (m[k] = {key:k, name:r.place, addr:r.addr||"", url:r.placeUrl||"", id:r.placeId||"", visits:0, sum:0, rated:0, last:""});
+    p.visits++; if (Number(r.rating)){ p.sum += Number(r.rating); p.rated++; }
+    if ((r.date||"") > p.last){ p.last = r.date || ""; p.name = r.place; }
+  });
+  return Object.values(m).map(p => Object.assign(p, {avg: p.rated ? Math.round(p.sum / p.rated * 10) / 10 : 0}));
+}
+function renderRanking(){
+  const list = ourPlaces().filter(p => p.avg).sort((a,b) => b.avg - a.avg || b.visits - a.visits).slice(0,5);
+  document.getElementById("ranking").innerHTML = list.length ? `<h3>우리 여행지 순위</h3><ol>${list.map(p =>
+    `<li><b>${esc(p.name)}</b> <span class="rstar">★${p.avg}</span> · ${p.visits}번 다녀옴</li>`).join("")}</ol>` : "";
+}
+function camperText(pid){
+  const c = window.COMMUNITY && COMMUNITY.stat(pid);
+  if (!window.COMMUNITY) return "";
+  if (!c) return "다른 여행자 별점 불러오는 중…";
+  return c.n ? `이 앱을 쓰는 여행자들 별점 <b>★${c.avg}</b> (${c.n}가족)` : "아직 다른 여행자 별점이 없어요.";
+}
+function refreshCamperText(){
+  document.querySelectorAll("[data-cpid]").forEach(el => { el.innerHTML = camperText(el.dataset.cpid); });
+}
+/* 우리 가족 별점을 다른 여행자들과 나눔(가족판에서만, 카카오에서 고른 여행지만) */
+function publishRating(pid){
+  if (!window.COMMUNITY || !pid) return;
+  const mine = records.filter(r => r.placeId === pid);
+  const rated = mine.filter(r => Number(r.rating));
+  const r0 = mine[0] || {};
+  COMMUNITY.publish(pid, {name:r0.place||"", addr:r0.addr||"", url:r0.placeUrl||""},
+    rated.length ? rated.reduce((s,r) => s + Number(r.rating), 0) / rated.length : 0, mine.length);
+}
+
+/* 이번 여행 별점 */
+function renderTripStars(){ document.getElementById("tripStars").innerHTML = starsHTML(Number(state.trip.rating)||0, 'data-trip="1"'); }
+document.getElementById("tripStars").addEventListener("click", e => {
+  const b = e.target.closest(".star"); if (!b) return;
+  const v = starValue(e, b);
+  state.trip.rating = Number(state.trip.rating) === v ? "" : v;
+  save(); renderTripStars();
+});
+/* 기록 별점은 나중에도 고칠 수 있음 */
+document.getElementById("records").addEventListener("click", e => {
+  const b = e.target.closest(".star[data-rid]"); if (!b) return;
+  e.preventDefault();
+  const id = b.dataset.rid, r = records.find(x => x.id === id); if (!r) return;
+  const pick = starValue(e, b), v = Number(r.rating) === pick ? "" : pick;
+  const open = [...document.querySelectorAll("#records details[open]")].map(d => d.querySelector(".star[data-rid]")?.dataset.rid);
+  r.rating = v; renderRecords(); reopen(open);
+  call("updateRecord", {id, rating:v}).then(l => {
+    if (l) { records = l; renderRecords(); reopen(open); }
+    if (r.placeId) publishRating(r.placeId);
+  }).catch(() => setSync("별점을 저장하지 못했어요. 잠시 뒤 다시 해 보세요.", "err"));
+});
+function reopen(ids){ ids.forEach(id => { const s = document.querySelector(`#records .star[data-rid="${id}"]`); if (s) s.closest("details").open = true; }); }
+
+/* 여행지 이름 칸: 다녀온 곳 + 카카오 장소 검색 */
+const placeInput = document.getElementById("tripPlace"), placeList = document.getElementById("placeList");
+let kakaoPlaces = null, placeTimer = null, placeItems = [], placeSel = -1, placeSeq = 0;
+function loadKakao(){
+  if (kakaoPlaces !== null) return Promise.resolve(kakaoPlaces);
+  const key = (window.KAKAO_JS_KEY || "").trim();
+  if (!key){ kakaoPlaces = false; return Promise.resolve(false); }
+  return new Promise(res => {
+    const sc = document.createElement("script");
+    sc.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=" + encodeURIComponent(key) + "&libraries=services&autoload=false";
+    sc.onload = () => { try{ kakao.maps.load(() => { kakaoPlaces = new kakao.maps.services.Places(); res(kakaoPlaces); }); }catch(e){ kakaoPlaces = false; res(false); } };
+    sc.onerror = () => { kakaoPlaces = false; res(false); };
+    document.head.appendChild(sc);
+  });
+}
+function renderPlaceLinks(){
+  const name = (state.trip.place || "").trim(), p = state.trip.pinfo;
+  document.getElementById("placeLinks").innerHTML = name ? (p && p.addr ? esc(p.addr) + " · " : "") + placeLinksHTML(name, p && p.url) : "";
+}
+function closePlaces(){ placeList.hidden = true; placeInput.setAttribute("aria-expanded", "false"); placeSel = -1; }
+function showPlaces(){
+  if (!placeItems.length){ closePlaces(); return; }
+  let html = "", lastGroup = "";
+  placeItems.forEach((p, i) => {
+    if (p.group !== lastGroup){ html += `<li class="phead" role="presentation">${p.group}</li>`; lastGroup = p.group; }
+    const camper = p.id && window.COMMUNITY ? COMMUNITY.stat(p.id) : null;
+    const badge = [p.ours ? `우리 ★${p.ours} · ${p.visits}번` : (p.visits ? `${p.visits}번 다녀옴` : ""),
+      camper && camper.n ? `여행자들 ★${camper.avg} (${camper.n})` : ""].filter(Boolean).join(" · ");
+    html += `<li role="option" id="po-${i}" data-i="${i}" aria-selected="${i === placeSel}"><span class="pn">${esc(p.name)}</span>${p.addr?`<span class="pa">${esc(p.addr)}</span>`:""}${badge?`<span class="pb">${badge}</span>`:""}</li>`;
+  });
+  placeList.innerHTML = html; placeList.hidden = false; placeInput.setAttribute("aria-expanded", "true");
+}
+function searchPlaces(){
+  const q = placeInput.value.trim(), seq = ++placeSeq;
+  if (!q){ placeItems = []; closePlaces(); return; }
+  const ql = q.toLowerCase();
+  const mine = ourPlaces().filter(p => (p.name||"").toLowerCase().includes(ql))
+    .sort((a,b) => b.visits - a.visits).slice(0,4)
+    .map(p => ({group:"다녀온 곳", name:p.name, addr:p.addr, url:p.url, id:p.id, ours:p.avg, visits:p.visits}));
+  placeItems = mine; placeSel = -1; showPlaces();
+  if (q.length < 2) return;
+  loadKakao().then(ps => {
+    if (!ps || seq !== placeSeq) return;
+    ps.keywordSearch(q, (data, status) => {
+      if (seq !== placeSeq || status !== kakao.maps.services.Status.OK) return;
+      const known = new Set(mine.map(p => p.id).filter(Boolean));
+      const found = data.filter(d => !known.has("k" + d.id)).slice(0, 6).map(d => {
+        const op = ourPlaces().find(p => p.id === "k" + d.id);
+        return {group:"카카오 장소 검색", name:d.place_name, addr:d.road_address_name || d.address_name, url:d.place_url, id:"k" + d.id, ours:op ? op.avg : 0, visits:op ? op.visits : 0};
+      });
+      placeItems = mine.concat(found); showPlaces();
+      if (window.COMMUNITY) COMMUNITY.want(found.map(p => p.id), () => { if (!placeList.hidden) showPlaces(); });
+    }, {size: 10});
+  });
+}
+function pickPlace(i){
+  const p = placeItems[i]; if (!p) return;
+  state.trip.place = p.name;
+  state.trip.pinfo = p.id || p.addr || p.url ? {id:p.id||"", addr:p.addr||"", url:p.url||""} : null;
+  placeInput.value = p.name; save(); closePlaces(); renderPlaceLinks();
+}
+placeInput.addEventListener("input", () => {
+  state.trip.pinfo = null; renderPlaceLinks();
+  clearTimeout(placeTimer); placeTimer = setTimeout(searchPlaces, 280);
+});
+placeInput.addEventListener("focus", () => { if (placeInput.value.trim() && !state.trip.pinfo) searchPlaces(); });
+placeInput.addEventListener("keydown", e => {
+  if (placeList.hidden) return;
+  if (e.key === "ArrowDown" || e.key === "ArrowUp"){
+    e.preventDefault(); placeSel = (placeSel + (e.key === "ArrowDown" ? 1 : -1) + placeItems.length) % placeItems.length;
+    showPlaces(); placeInput.setAttribute("aria-activedescendant", "po-" + placeSel);
+  } else if (e.key === "Enter" && placeSel >= 0){ e.preventDefault(); pickPlace(placeSel); }
+  else if (e.key === "Escape"){ closePlaces(); }
+});
+placeList.addEventListener("mousedown", e => e.preventDefault());
+placeList.addEventListener("click", e => { const li = e.target.closest("li[data-i]"); if (li) pickPlace(Number(li.dataset.i)); });
+placeInput.addEventListener("blur", () => setTimeout(closePlaces, 120));
+
+/* ---------- 여행 기록 ---------- */
+function renderRecords(){
+  const yr = String(new Date().getFullYear());
+  const nights = records.reduce((s,r) => s + (Number(r.nights)||0), 0);
+  document.getElementById("stats").innerHTML = [
+    [records.length, "모든 여행"], [records.filter(r => (r.date||"").startsWith(yr)).length, yr+"년"], [nights, "모두 몇 박"]
+  ].map(([v,k]) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
+
+  const cnt = {};
+  records.forEach(r => (r.missed||[]).forEach(m => { cnt[m] = (cnt[m]||0) + 1; }));
+  const top = Object.entries(cnt).filter(([,c]) => c >= 2).sort((a,b) => b[1]-a[1]).slice(0,4);
+  document.getElementById("often").innerHTML = top.length
+    ? `자주 안 챙긴 항목: ${top.map(([m,c]) => `<b>${esc(m)}</b> ${c}번`).join(" · ")} — 필요 없으면 목록에서 빼도 좋아요.`
+    : "";
+
+  renderRanking();
+  if (window.COMMUNITY) COMMUNITY.want(records.map(r => r.placeId).filter(Boolean));
+  const ol = document.getElementById("records");
+  if (!records.length){
+    ol.innerHTML = `<li class="no-rec">아직 기록이 없어요. 여행을 다녀오면 [이번 여행 기록하기]로 날짜별로 남겨 두세요.</li>`;
+    return;
+  }
+  ol.innerHTML = records.map(r => editRec === r.id ? recordForm(r) : `<li><details>
+    <summary><span class="rdate">${esc((r.date||"날짜 없음").replace(/-/g,"."))}</span>
+      <span class="rplace">${esc(r.place || "여행지 미입력")}</span>
+      <span class="rmeta">${Number(r.rating)?`<span class="rstar">★${Number(r.rating)}</span> · `:""}${r.nights?esc(r.nights)+"박 · ":""}${r.temp?esc(r.temp)+" · ":""}챙김 ${r.got}/${r.total}</span></summary>
+    <div class="rbody">
+      <div class="rate-row"><span>우리 별점</span>${starsHTML(Number(r.rating)||0, `data-rid="${esc(r.id)}"`, "sm")}</div>
+      ${r.place ? `<p>${r.addr?esc(r.addr)+" · ":""}${placeLinksHTML(r.place, r.placeUrl)}</p>` : ""}
+      ${r.placeId ? `<p class="camper" data-cpid="${esc(r.placeId)}">${camperText(r.placeId)}</p>` : ""}
+      ${r.memo?`<p><b>메모</b> ${esc(r.memo)}</p>`:""}
+      ${r.missed && r.missed.length ? `<p><b>안 챙긴 항목</b> ${esc(r.missed.join(", "))}</p>` : "<p>목록을 모두 챙겼어요.</p>"}
+      <div class="rbtns"><button class="link redit" data-id="${esc(r.id)}">기록 고치기</button>
+        <span id="rd-${esc(r.id)}"><button class="link warn rdel" data-id="${esc(r.id)}">이 기록 삭제</button></span></div>
+    </div></details></li>`).join("");
+}
+/* 기록 고치기 */
+let editRec = null;
+function recordForm(r){
+  const id = esc(r.id);
+  return `<li class="redit-box"><form class="rform" data-id="${id}">
+    <div class="rgrid">
+      <label>출발일<input class="field" name="date" type="date" value="${esc(r.date||"")}"></label>
+      <label>몇 박<input class="field" name="nights" type="number" min="0" max="30" inputmode="numeric" value="${esc(r.nights||"")}"></label>
+      <label class="wide">여행지<input class="field" name="place" type="text" value="${esc(r.place||"")}"></label>
+      <label>교통편<input class="field" name="temp" type="text" value="${esc(r.temp||"")}" placeholder="예: 비행기, KTX"></label>
+      <label class="wide">메모<textarea class="field" name="memo" rows="2">${esc(r.memo||"")}</textarea></label>
+      <label class="wide">안 챙긴 항목 <span class="camper">(쉼표로 나눠 적기)</span><textarea class="field" name="missed" rows="2">${esc((r.missed||[]).join(", "))}</textarea></label>
+    </div>
+    <div class="rbtns"><button type="submit" class="primary">저장</button><button type="button" class="link rcancel">취소</button></div>
+  </form></li>`;
+}
+document.getElementById("records").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.classList.contains("redit")){ editRec = b.dataset.id; renderRecords(); const f = document.querySelector(".rform input[name=place]"); if (f) f.focus(); }
+  else if (b.classList.contains("rcancel")){ const id = editRec; editRec = null; renderRecords(); reopen([id]); }
+});
+document.getElementById("records").addEventListener("submit", e => {
+  e.preventDefault();
+  const f = e.target, id = f.dataset.id, r = records.find(x => x.id === id); if (!r) return;
+  const v = n => f.elements[n].value.trim();
+  const missed = v("missed") ? v("missed").split(/\s*,\s*/).filter(Boolean) : [];
+  const fields = {date:v("date"), nights:v("nights"), place:v("place"), temp:v("temp"), memo:v("memo"), missed};
+  if (Array.isArray(r.missed) && r.total){ fields.got = Math.max(0, r.total - missed.length); }
+  const oldPid = r.placeId;
+  if (fields.place !== (r.place||"")){ fields.placeId = ""; fields.addr = ""; fields.placeUrl = ""; }   // 이름을 바꾸면 카카오 장소 연결은 풀림
+  const btn = f.querySelector("button[type=submit]"); btn.disabled = true;
+  call("updateRecord", {id, fields}).then(l => {
+    editRec = null; if (l) records = sortRecs(l); renderRecords(); reopen([id]);
+    if (oldPid && fields.placeId === "") publishRating(oldPid);
+    toast("기록을 고쳤어요.");
+  }).catch(() => { btn.disabled = false; setSync("기록을 고치지 못했어요. 잠시 뒤 다시 해 보세요.", "err"); });
+});
+document.getElementById("records").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const id = b.dataset.id;
+  if (b.classList.contains("rdel")){
+    document.getElementById("rd-"+id).innerHTML = `<span class="confirm">삭제할까요? <button class="yes rdel-yes" data-id="${esc(id)}">삭제</button><button class="rdel-no" data-id="${esc(id)}">취소</button></span>`;
+  } else if (b.classList.contains("rdel-no")){
+    renderRecords();
+  } else if (b.classList.contains("rdel-yes")){
+    b.disabled = true;
+    call("deleteRecord", id).then(l => { records = l; renderRecords(); })
+      .catch(() => { b.disabled = false; setSync("기록을 지우지 못했어요. 잠시 뒤 다시 해 보세요.", "err"); });
+  }
+});
+
+const msg = document.getElementById("recMsg");
+document.getElementById("saveRec").addEventListener("click", () => {
+  const btn = document.getElementById("saveRec");
+  msg.className = "msg";
+  if (!state.trip.start){
+    msg.className = "msg err"; msg.textContent = "맨 위 출발일을 먼저 넣어 주세요.";
+    document.getElementById("tripStart").focus(); return;
+  }
+  const packed = [], missed = [];
+  state.zones.forEach(z => { (shownItems(z) || []).forEach(i => (state.checked[i.id] ? packed : missed).push(i.t)); });
+  const rec = {date:state.trip.start, nights:state.trip.nights||"", place:state.trip.place||"", temp:state.trip.temp||"",
+    memo:state.memo||"", got:packed.length, total:packed.length+missed.length, packed, missed,
+    rating:state.trip.rating||"", addr:(state.trip.pinfo&&state.trip.pinfo.addr)||"", placeUrl:(state.trip.pinfo&&state.trip.pinfo.url)||"", placeId:(state.trip.pinfo&&state.trip.pinfo.id)||""};
+  btn.disabled = true; btn.textContent = "기록하는 중…";
+  call("saveRecord", rec).then(l => {
+    if (rec.placeId) setTimeout(() => publishRating(rec.placeId), 1500);
+    records = l; renderRecords();
+    btn.disabled = false; btn.textContent = "이번 여행 기록하기";
+    msg.innerHTML = `${esc(rec.date.replace(/-/g,"."))} 기록을 ${REMOTE?"가족 공간에 ":""}남겼어요. 다음 여행 준비로 비울까요?
+      <span class="confirm"><button class="yes" id="clearYes">체크·메모 비우기</button><button id="clearNo">그대로 두기</button></span>`;
+  }).catch(() => {
+    btn.disabled = false; btn.textContent = "이번 여행 기록하기";
+    msg.className = "msg err"; msg.textContent = "기록하지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요.";
+  });
+});
+msg.addEventListener("click", e => {
+  if (e.target.id === "clearYes"){
+    state.memo = ""; state.trip = {}; save(); clearChecks(); fillTrip(); render();
+    msg.textContent = "비웠어요. 다음 여행도 즐겁게!";
+  } else if (e.target.id === "clearNo"){ msg.textContent = ""; }
+});
+
+/* ---------- 불러오기 · 함께 쓰는 사람 변경 받아오기 ---------- */
+const hhmm = () => { const d = new Date(); return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0"); };
+function isTyping(){
+  const a = document.activeElement;
+  return dragging || !!quick || (a && (a.tagName === "TEXTAREA" || (a.tagName === "INPUT" && a.type !== "checkbox")));
+}
+/* 가족 공간에서 바뀐 내용이 오면 반영. 글을 쓰거나 고치는 중이면 끝난 뒤에 반영 */
+let incoming = null;
+function applyFamily(d){
+  if (!d) return;
+  if (isTyping() || saveTimer){ incoming = d; return; }
+  incoming = null;
+  const next = Object.assign({}, state);
+  ["zones","labels","trip","memo","f"].forEach(k => { if (d[k] !== undefined) next[k] = d[k]; });
+  next.checked = d.checked || {};
+  state = next; normalize();
+  lsSet(KEY, JSON.stringify(state));
+  fillTrip(); render();
+}
+setInterval(() => { if (incoming && !isTyping() && !saveTimer) applyFamily(incoming); }, 1200);
+document.addEventListener("focusout", () => setTimeout(() => { if (incoming && !isTyping() && !saveTimer) applyFamily(incoming); }, 50));
+
+function applyRecords(list){ records = sortRecs(list); if (editRec) return; renderRecords(); }   // 고치는 중이면 다 고친 뒤에 다시 그림
+
+/* ---------- 계정 · 가족 공간 표시 ---------- */
+const acctText = document.getElementById("acctText"), acctBtns = document.getElementById("acctBtns"), acctDot = document.getElementById("acctDot");
+const famEl = document.getElementById("fam"), famMsg = document.getElementById("famMsg");
+const G_ICON = '<svg viewBox="0 0 18 18" width="16" height="16" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.7H9v3.3h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 5.9-2.2L12 13.6c-.8.5-1.8.9-3 .9-2.3 0-4.3-1.6-5-3.7H1v2.3A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M4 10.8a5.4 5.4 0 0 1 0-3.5V5H1a9 9 0 0 0 0 8z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3L15 2.4A9 9 0 0 0 1 5l3 2.3c.7-2.1 2.7-3.7 5-3.7z"/></svg>';
+let ACCOUNT = {phase:"loading"};   // loading | noconfig | out | nofamily | in
+function showConnState(){
+  if (!REMOTE) return;
+  if (!navigator.onLine) setSync("인터넷이 끊겼어요. 체크한 것은 이 기기에 두었다가 연결되면 가족 공간에 올라가요.", "err");
+  else if (pending) setSync("가족 공간에 저장 중…");
+  else setSync("가족 공간과 실시간으로 연결됨", "ok");
+}
+window.addEventListener("online", showConnState);
+window.addEventListener("offline", showConnState);
+function renderAccount(){
+  const a = ACCOUNT;
+  famEl.hidden = a.phase !== "nofamily";
+  acctDot.className = "dot" + (a.phase === "in" ? (navigator.onLine ? " on" : " off") : "");
+  if (a.phase === "loading"){ acctText.textContent = "불러오는 중…"; acctBtns.innerHTML = ""; }
+  else if (a.phase === "noconfig"){
+    acctText.textContent = "파이어베이스 설정값이 아직 없어 이 기기에만 저장돼요.";
+    acctBtns.innerHTML = "";
+  } else if (a.phase === "out"){
+    acctText.innerHTML = a.joining ? "<b>가족 초대 링크로 들어왔어요.</b> 구글로 로그인하면 가족 공간에 들어가요." : "지금은 이 기기에만 저장돼요. 로그인하면 가족과 함께 써요.";
+    acctBtns.innerHTML = `<button class="gbtn" id="loginBtn">${G_ICON}구글로 로그인</button>`;
+  } else if (a.phase === "nofamily"){
+    acctText.innerHTML = `<b>${esc(a.user.name)}</b> 님으로 로그인했어요.`;
+    acctBtns.innerHTML = '<button class="link" id="logoutBtn">로그아웃</button>';
+  } else if (a.phase === "in"){
+    const ms = (FAMILY.members || []).map(m => `<span class="member">${esc(m.name)}${m.uid === a.user.uid ? " (나)" : ""}</span>`).join("");
+    acctText.innerHTML = `<span class="who"><b>${esc(FAMILY.name)}</b><span class="members">${ms}</span></span>`;
+    acctBtns.innerHTML = '<button class="link" id="logoutBtn">로그아웃</button>';
+  }
+  if (a.phase !== "in" && a.phase !== "noconfig") setSync(a.phase === "loading" ? "불러오는 중…" : "로그인하지 않아 이 기기에만 저장돼요.");
+  if (a.phase === "noconfig") setSync("이 기기에만 저장돼요.");
+}
+acctBtns.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (!window.FBAPP) return;
+  if (b.id === "loginBtn"){ b.disabled = true; window.FBAPP.login().catch(err => { b.disabled = false; acctText.textContent = "로그인하지 못했어요. " + (err && err.message || ""); }); }
+  if (b.id === "logoutBtn") window.FBAPP.logout();
+});
+document.getElementById("famCreate").addEventListener("click", () => {
+  const name = document.getElementById("famName").value.trim() || "우리 가족 여행", btn = document.getElementById("famCreate");
+  btn.disabled = true; famMsg.className = "msg"; famMsg.textContent = "만드는 중…";
+  window.FBAPP.createFamily(name, Object.assign(settingsObj(), {checked:state.checked}), local.getData().records)
+    .then(() => { famMsg.textContent = ""; toast("가족 공간을 만들었어요. 위의 가족 초대 QR로 가족을 불러 주세요."); })
+    .catch(err => { famMsg.className = "msg err"; famMsg.textContent = "만들지 못했어요. " + (err && err.message || ""); })
+    .finally(() => { btn.disabled = false; });
+});
+
+/* 파이어베이스 스크립트가 부르는 연결점 */
+window.CAMP = {
+  setAccount(info){ ACCOUNT = info; renderAccount(); if (document.body.dataset.tab === "set") renderFamTab(); },
+  enterFamily(fam, remote){
+    FAMILY = fam; REMOTE = remote; ACCOUNT = Object.assign({}, ACCOUNT, {phase:"in"}); renderAccount(); showConnState();
+    if (document.body.dataset.tab === "set") renderFamTab();
+  },
+  updateFamilyInfo(fam){ FAMILY = Object.assign({}, FAMILY, fam); renderAccount(); if (document.body.dataset.tab === "set") renderFamTab(); },
+  leaveFamily(){ FAMILY = null; REMOTE = null; records = local.getData().records; renderRecords(); },
+  applyFamily, applyRecords, showConnState
+};
+
+/* ---------- 가족 공유 QR ---------- */
+const qrModal = document.getElementById("qrModal"), qrMsg = document.getElementById("qrMsg");
+let qrUrl = "", qrReturn = null;
+function openQr(){
+  const inv = FAMILY && FAMILY.invite;
+  qrUrl = location.origin + location.pathname + (inv ? "?join=" + encodeURIComponent(FAMILY.id + "." + inv) : "");
+  document.getElementById("qrText").textContent = inv
+    ? "가족이 휴대폰 카메라로 찍고 구글로 로그인하면 '" + FAMILY.name + "' 공간에 함께 들어와요."
+    : "아직 가족 공간이 없어 화면만 열려요. 로그인하고 가족 공간을 만들면 이 QR이 초대장이 돼요.";
+  document.getElementById("qrWarn").hidden = !inv;
+  const box = document.getElementById("qrBox");
+  try{
+    const q = qrcode(0, "M"); q.addData(qrUrl); q.make();
+    box.innerHTML = q.createSvgTag({cellSize:6, margin:2, scalable:true});
+  }catch(e){
+    box.innerHTML = '<p style="color:#5E665C;font-size:13px;margin:0">QR을 만들지 못했어요. 인터넷에 연결한 뒤 다시 열거나, 링크 복사를 써 주세요.</p>';
+  }
+  qrMsg.textContent = "";
+  qrReturn = document.activeElement;
+  qrModal.hidden = false;
+  document.getElementById("qrClose").focus();
+}
+function closeQr(){ qrModal.hidden = true; if (qrReturn) qrReturn.focus(); }
+document.getElementById("qrBtn").addEventListener("click", openQr);
+document.getElementById("qrClose").addEventListener("click", closeQr);
+qrModal.addEventListener("click", e => { if (e.target === qrModal) closeQr(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !qrModal.hidden) closeQr(); });
+document.getElementById("qrCopy").addEventListener("click", () => {
+  const done = () => { qrMsg.textContent = "링크를 복사했어요. 카톡으로 보내도 돼요."; };
+  const fail = () => { qrMsg.textContent = qrUrl; };
+  try{ navigator.clipboard.writeText(qrUrl).then(done, fail); }catch(e){ fail(); }
+});
+
+/* ---------- 앱으로 설치 ---------- */
+const STANDALONE = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+const IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const installBox = document.getElementById("install"), installText = document.getElementById("installText"), installGo = document.getElementById("installGo");
+let installEvt = null;
+/* 한 번 설치했거나 앱으로 연 기기는 브라우저에서도 설치 안내를 다시 띄우지 않음 */
+const IKEY = "tripcheck-installed";
+if (STANDALONE) lsSet(IKEY, "1");
+const UA = navigator.userAgent;
+const MOBILE = /android|iphone|ipad|ipod/i.test(UA) || IOS;
+function installHow(){
+  if (/KAKAOTALK/i.test(UA)) return "카카오톡 안에서는 설치가 안 돼요. 오른쪽 위 [⋮] → [다른 브라우저로 열기]로 연 다음 설치해 주세요.";
+  if (/NAVER\(inapp|Instagram|FBAN|FBAV|Line\//i.test(UA)) return "이 앱 안의 브라우저에서는 설치가 안 돼요. 메뉴에서 [다른 브라우저로 열기]를 고른 다음 설치해 주세요.";
+  if (IOS) return "아이폰은 사파리 아래쪽 [공유] 버튼을 누르고 [홈 화면에 추가]를 고르세요.";
+  if (/SamsungBrowser/i.test(UA)) return "삼성 인터넷은 주소창 오른쪽 [⬇] 설치 버튼을 누르거나, 아래 [≡] 메뉴 → [현재 페이지 추가] → [홈 화면]을 고르세요.";
+  if (/android/i.test(UA)) return "크롬은 오른쪽 위 [⋮] 메뉴 → [홈 화면에 추가] 또는 [앱 설치]를 고르세요.";
+  return "브라우저 주소창 오른쪽의 설치 아이콘이나, 메뉴의 [앱 설치]를 눌러 주세요.";
+}
+const installLater = () => {
+  if (STANDALONE || lsGet(IKEY)) return "1";
+  try{ return sessionStorage.getItem("tripcheck-install-later"); }catch(e){ return null; }
+};
+function showInstall(force){
+  if (STANDALONE) return;
+  if (!force && installLater()) return;
+  if (installEvt){ installText.textContent = "휴대폰에 앱으로 설치하면 아이콘을 눌러 바로 열 수 있어요."; installGo.hidden = false; }
+  else { installText.textContent = installHow(); installGo.hidden = true; }
+  installBox.hidden = false;
+  if (force) installBox.scrollIntoView({behavior:"smooth", block:"center"});
+}
+if ("serviceWorker" in navigator && location.protocol === "https:"){
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; showInstall(false); });
+if (MOBILE && !STANDALONE) setTimeout(() => { if (installBox.hidden) showInstall(false); }, 2500);   // 설치 버튼을 안 주는 브라우저에서는 방법을 알려 줌
+installGo.addEventListener("click", async () => {
+  if (!installEvt) return;
+  installEvt.prompt();
+  try{ const c = await installEvt.userChoice; if (c && c.outcome === "accepted") lsSet(IKEY, "1"); }catch(e){}
+  installEvt = null; installBox.hidden = true;
+});
+document.getElementById("installLater").addEventListener("click", () => {
+  installBox.hidden = true;
+  try{ sessionStorage.setItem("tripcheck-install-later", "1"); }catch(e){}
+});
+window.addEventListener("appinstalled", () => { installBox.hidden = true; lsSet(IKEY, "1"); });
+const installAny = document.getElementById("installAny");
+installAny.hidden = STANDALONE;
+installAny.addEventListener("click", () => showInstall(true));
+
+/* ---------- 휴대폰 아래 탭 ---------- */
+const TABS = ["home","log","set"];
+function setTab(t){
+  if (!TABS.includes(t)) t = "home";
+  document.body.dataset.tab = t;
+  document.querySelectorAll(".tabbar button").forEach(b => { if (b.dataset.tab === t) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  if (t === "set"){ renderLabelList(); renderFamTab(); }
+  if (t === "log") renderWriteHead();
+  window.scrollTo({top:0});
+}
+document.querySelector(".tabbar").addEventListener("click", e => { const b = e.target.closest("button[data-tab]"); if (b) setTab(b.dataset.tab); });
+function renderWriteHead(){
+  const t = state.trip || {};
+  document.getElementById("writeTrip").textContent = t.start
+    ? `${t.start.replace(/-/g,".")}${t.nights ? " · " + t.nights + "박" : ""}${t.place ? " · " + t.place : ""} — 별점과 메모를 남기고 저장하세요.`
+    : "체크 화면 위쪽에 출발일과 여행지을 먼저 넣어 주세요.";
+}
+function qrSvg(url){
+  try{ const q = qrcode(0, "M"); q.addData(url); q.make(); return q.createSvgTag({cellSize:6, margin:2, scalable:true}); }
+  catch(e){ return '<p style="margin:0;font-size:13px;color:#5E665C">QR을 만들지 못했어요. 링크 복사를 써 주세요.</p>'; }
+}
+function renderFamTab(){
+  const box = document.getElementById("famTabBody"), a = ACCOUNT;
+  if (a.phase === "in" && FAMILY){
+    const url = location.origin + location.pathname + "?join=" + encodeURIComponent(FAMILY.id + "." + FAMILY.invite);
+    box.innerHTML = `<p style="margin:0"><b>${esc(FAMILY.name)}</b></p>
+      <div class="members">${(FAMILY.members||[]).map(m => `<span class="member">${esc(m.name)}${m.uid === (a.user && a.user.uid) ? " (나)" : ""}</span>`).join("")}</div>
+      <p class="camper" style="margin:6px 0 0">가족이 이 QR을 찍고 구글로 로그인하면 함께 써요. 가족에게만 보여 주세요.</p>
+      <div class="fam-qr">${qrSvg(url)}</div>
+      <div class="rbtns" style="justify-content:center"><button class="chip" id="famCopy">초대 링크 복사</button><button class="link" id="famLogout">로그아웃</button></div>
+      <p class="msg" id="famCopyMsg" aria-live="polite"></p>`;
+    box.querySelector("#famCopy").onclick = () => {
+      const m = box.querySelector("#famCopyMsg");
+      try{ navigator.clipboard.writeText(url).then(() => m.textContent = "링크를 복사했어요. 카톡으로 보내 주세요.", () => m.textContent = url); }catch(e){ m.textContent = url; }
+    };
+    box.querySelector("#famLogout").onclick = () => window.FBAPP && window.FBAPP.logout();
+  } else if (a.phase === "out"){
+    box.innerHTML = `<p style="margin:0">로그인하면 가족과 함께 써요.</p><div><button class="gbtn" id="famLogin">${G_ICON}구글로 로그인</button></div>`;
+    box.querySelector("#famLogin").onclick = () => window.FBAPP && window.FBAPP.login().catch(err => toast("로그인하지 못했어요. " + (err && err.message || "")));
+  } else if (a.phase === "nofamily"){
+    box.innerHTML = `<p style="margin:0">아래에서 가족 공간을 만들거나, 가족이 보여 주는 QR을 찍어 들어오세요.</p>`;
+  } else {
+    box.innerHTML = `<p style="margin:0">${a.phase === "noconfig" ? "지금은 이 기기에만 저장돼요." : "불러오는 중…"}</p>`;
+  }
+}
+twoStep("defaultBox2", "되돌리기", "정말 처음 목록으로 바꿀까요?", "바꾸기",
+  () => { state.zones = defaultZones(); state.labels = DEFAULT_LABELS.map(l => Object.assign({}, l)); save(); clearChecks(); render(); toast("처음 목록으로 바꿨어요."); });
+document.getElementById("installSet").addEventListener("click", () => showInstall(true));
+
+/* ---------- 계정·자료 관리 ---------- */
+const mgEl = document.getElementById("manage"), mgMsg = document.getElementById("mgMsg");
+function openManage(){
+  const inFam = ACCOUNT.phase === "in" && FAMILY, loggedIn = inFam || ACCOUNT.phase === "nofamily";
+  const alone = inFam && (FAMILY.members || []).length <= 1;
+  document.getElementById("mgLeaveRow").hidden = !inFam;
+  document.getElementById("mgDelRow").hidden = !loggedIn;
+  document.getElementById("mgLeaveText").textContent = alone
+    ? "지금 가족 공간에 나 혼자예요. 나가면 가족 공간과 여행 기록이 모두 지워져요."
+    : "나만 빠지고 남은 가족의 목록과 기록은 그대로예요.";
+  document.getElementById("mgDelText").textContent = (inFam ? (alone ? "가족 공간과 여행 기록을 모두 지우고 " : "가족 공간에서 나간 뒤 ") : "")
+    + "트립첵! 자료를 지우고 로그아웃해요. 구글 계정은 캠첵!과 함께 쓰므로 그대로 둬요. 되살릴 수 없으니 필요하면 먼저 기록을 내려받으세요.";
+  document.getElementById("mgDelInput").value = ""; document.getElementById("mgDel").disabled = true;
+  mgMsg.className = "msg"; mgMsg.textContent = loggedIn ? "" : "로그인하지 않아 이 기기에만 저장돼 있어요. 기록 내려받기만 할 수 있어요.";
+  const oldBox = document.getElementById("mgLeaveBox"); oldBox.replaceWith(oldBox.cloneNode(false));   // 열 때마다 새로 (누름이 겹치지 않게)
+  twoStep("mgLeaveBox", "나가기", alone ? "모두 지워져요. 나갈까요?" : "정말 나갈까요?", "나가기", async () => {
+    mgMsg.className = "msg"; mgMsg.textContent = "나가는 중…";
+    try{ await window.FBAPP.leaveFamily(); mgMsg.textContent = "가족 공간에서 나왔어요."; toast("가족 공간에서 나왔어요."); setTimeout(closeManage, 900); }
+    catch(err){ mgMsg.className = "msg err"; mgMsg.textContent = "나가지 못했어요. " + (err && err.message || ""); }
+  });
+  mgEl.hidden = false; document.getElementById("mgClose").focus();
+}
+function closeManage(){ mgEl.hidden = true; }
+document.getElementById("acctManage").addEventListener("click", openManage);
+document.getElementById("manageSet").addEventListener("click", openManage);
+document.getElementById("mgClose").addEventListener("click", closeManage);
+mgEl.addEventListener("click", e => { if (e.target === mgEl) closeManage(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !mgEl.hidden) closeManage(); });
+document.getElementById("mgDelInput").addEventListener("input", e => { document.getElementById("mgDel").disabled = e.target.value.trim() !== "지우기"; });
+document.getElementById("mgDel").addEventListener("click", async () => {
+  const btn = document.getElementById("mgDel"); btn.disabled = true;
+  mgMsg.className = "msg"; mgMsg.textContent = "지우는 중…";
+  try{
+    await window.FBAPP.deleteAccount();
+    try{ Object.keys(localStorage).filter(k => /^(tripfb-|tripcheck-)/.test(k)).forEach(k => localStorage.removeItem(k)); }catch(e){}
+    mgMsg.textContent = "트립첵! 자료를 모두 지웠어요. 그동안 써 주셔서 고마워요.";
+    setTimeout(() => location.replace(location.pathname), 1800);
+  }catch(err){ btn.disabled = false; mgMsg.className = "msg err"; mgMsg.textContent = "지우지 못했어요. " + (err && err.message || ""); }
+});
+/* 여행 기록을 엑셀용 CSV로 */
+document.getElementById("mgCsv").addEventListener("click", () => {
+  const head = ["출발일","박","여행지","주소","교통편","우리 별점","메모","챙긴 수","전체 수","안 챙긴 항목"];
+  const q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
+  const rows = records.map(r => [r.date, r.nights, r.place, r.addr, r.temp, r.rating, r.memo, r.got, r.total, (r.missed || []).join(", ")].map(q).join(","));
+  const csv = "\ufeff" + [head.map(q).join(",")].concat(rows).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8"}));
+  a.download = "트립첵_여행기록_" + new Date().toISOString().slice(0,10) + ".csv";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  mgMsg.className = "msg"; mgMsg.textContent = records.length ? `기록 ${records.length}개를 내려받았어요.` : "아직 기록이 없어 제목 줄만 있는 파일이에요.";
+});
+
+/* ---------- 시작 ---------- */
+fillTrip(); render(); renderAccount();
+setTab("home");   // 늘 체크 화면부터
+records = local.getData().records; renderRecords();
+</script>
+<script type="module" src="app-firebase.js"></script>
+</body>
+</html>
