@@ -501,6 +501,42 @@ body.dragging,body.dragging *{user-select:none!important;-webkit-user-select:non
 .place-links a{white-space:nowrap}
 .wx-note{word-break:keep-all}
 
+/* 위쪽 정보: 왼쪽 두 줄(출발일·몇 박 / 캠핑장), 오른쪽 예상 기온·날씨 */
+.trip{grid-template-columns:1.2fr .8fr 1.7fr;grid-template-areas:"start nights wx" "place trans wx";align-items:start}
+.t-start{grid-area:start}.t-nights{grid-area:nights}.t-place{grid-area:place}.t-trans{grid-area:trans}.t-wx{grid-area:wx}
+@media (max-width:560px){.trip{grid-template-columns:1fr 1fr;grid-template-areas:"start nights" "place trans" "wx wx"}}
+/* 날씨 표: 위 줄은 날짜·하늘·바람, 아래 줄은 최저/최고 */
+.wx-days{min-width:0}
+.wx-table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.wx-table td{padding:7px 4px;text-align:center;vertical-align:middle;border-left:1px solid var(--line);line-height:1.3}
+.wx-table td:first-child{border-left:none}
+.wx-table td b{display:block;font-size:13px;color:var(--ink);white-space:nowrap}
+.wx-table td b i{font-style:normal;font-weight:700;color:var(--muted)}
+.wx-table td span{display:block;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+.wx-sky{display:flex!important;align-items:center;justify-content:center;gap:2px;color:var(--forest)!important;margin:2px 0}
+.wx-sky svg{width:17px;height:17px;flex:none}
+.wx-table .hot{color:var(--accent)!important}
+.wx-temp td{border-top:1px dashed var(--line);font-family:var(--f-mono);font-size:14px;font-weight:700;color:var(--ink);padding:5px 4px;white-space:nowrap}
+.wx-temp td span{display:inline;font-size:14px;color:inherit}
+.wx-table td.warn{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.wx-none{color:var(--done)!important;font-weight:700}
+.wx-empty{color:var(--muted);font-size:12.5px;font-weight:700;padding:14px 8px!important;line-height:1.5;font-family:var(--f-body)!important}
+.wx-temp td.wx-empty{font-size:12.5px;color:var(--muted);font-weight:700}
+.wx-addr{display:flex;gap:6px;margin-top:8px}
+.wx-addr .field{flex:1;min-width:0;font-size:13px;padding:7px 10px;font-weight:600}
+.wx-addr .chip{flex:none;padding:6px 14px}
+.wx-addr-msg{display:block;margin-top:4px;font-size:12px;color:var(--accent)}
+.wx-empty .wx-addr-msg:empty{display:none}
+.wx-w{margin:4px 0 0;font-size:11.5px;font-weight:800;color:var(--accent);word-break:keep-all;line-height:1.4}
+.temp-field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--muted);min-width:0}
+.wx-note{font-size:11.5px;font-weight:700;color:var(--muted);line-height:1.45;word-break:keep-all}
+.wx-note:empty{display:none}
+.wx-note .link{font-size:11.5px;color:var(--forest)}
+.wx-pick{display:flex;flex-direction:column;gap:4px;margin-top:6px;text-align:left}
+.wx-pick button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:7px 10px;font:inherit;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;text-align:left}
+.wx-pick button small{display:block;font-size:11.5px;color:var(--muted);font-weight:600}
+.wx-pick button:hover{border-color:var(--forest)}
+
 /* 항목 이름도 낱말 단위로만 줄바꿈 */
 li .txt,.rplace,.place-list .pn{word-break:keep-all;overflow-wrap:break-word}
 
@@ -530,13 +566,14 @@ li.imp.on .must{opacity:.4}
       <div class="cap" id="totalCap">챙긴 짐</div>
     </div>
     <div class="trip">
-      <label>출발일<input class="field" id="tripStart" type="date"></label>
-      <label>몇 박<input class="field" id="tripNights" type="number" min="0" max="30" inputmode="numeric" placeholder="1"></label>
-      <div class="place-field"><label for="tripPlace">여행지</label>
+      <label class="t-start">출발일<input class="field" id="tripStart" type="date"></label>
+      <label class="t-nights">몇 박<input class="field" id="tripNights" type="number" min="0" max="30" inputmode="numeric" placeholder="1"></label>
+      <div class="place-field t-place"><label for="tripPlace">여행지</label>
         <input class="field" id="tripPlace" type="text" placeholder="여행지·숙소 이름을 치면 찾아 줘요" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="placeList">
         <ul class="place-list" id="placeList" role="listbox" hidden></ul>
         <span class="place-links" id="placeLinks"></span></div>
-      <label>교통편<input class="field" id="tripTemp" type="text" placeholder="예: 비행기, KTX"></label>
+      <label class="t-trans">교통편<input class="field" id="tripTemp" type="text" placeholder="예: 비행기, KTX"></label>
+      <div class="temp-field t-wx"><span>날씨 예보</span><div class="wx-days" id="wxDays"></div><span class="wx-note" id="wxNote"></span></div>
     </div>
   </header>
 
@@ -1298,12 +1335,12 @@ function searchPlaces(){
     if (!ps){ placeNote = (window.KAKAO_JS_KEY || "").trim() ? kakaoWhy : ""; showPlaces(); return; }
     ps.keywordSearch(q, (data, status) => {
       if (seq !== placeSeq) return;
-      if (status === kakao.maps.services.Status.ZERO_RESULT){ placeNote = "카카오에서 찾은 곳이 없어요. 이름을 조금 바꿔 보세요."; showPlaces(); return; }
+      if (status === kakao.maps.services.Status.ZERO_RESULT){ placeNote = "카카오에서 찾은 곳이 없어요. 해외라면 날씨 예보 칸에서 도시 이름으로 찾아 주세요."; showPlaces(); return; }
       if (status !== kakao.maps.services.Status.OK){ placeNote = "카카오 검색 오류가 났어요. 카카오 개발자 사이트의 도메인·카카오맵 설정을 확인해 주세요."; showPlaces(); return; }
       const known = new Set(mine.map(p => p.id).filter(Boolean));
       const found = data.filter(d => !known.has("k" + d.id)).slice(0, 6).map(d => {
         const op = ourPlaces().find(p => p.id === "k" + d.id);
-        return {group:"카카오 장소 검색", name:d.place_name, addr:d.road_address_name || d.address_name, url:d.place_url, id:"k" + d.id, ours:op ? op.avg : 0, visits:op ? op.visits : 0};
+        return {group:"카카오 장소 검색", name:d.place_name, addr:d.road_address_name || d.address_name, url:d.place_url, id:"k" + d.id, lat:+d.y, lon:+d.x, ours:op ? op.avg : 0, visits:op ? op.visits : 0};
       });
       placeItems = mine.concat(found); showPlaces();
       if (window.COMMUNITY) COMMUNITY.want(found.map(p => p.id), () => { if (!placeList.hidden) showPlaces(); });
@@ -1313,11 +1350,11 @@ function searchPlaces(){
 function pickPlace(i){
   const p = placeItems[i]; if (!p) return;
   state.trip.place = p.name;
-  state.trip.pinfo = p.id || p.addr || p.url ? {id:p.id||"", addr:p.addr||"", url:p.url||""} : null;
-  placeInput.value = p.name; save(); closePlaces(); renderPlaceLinks();
+  state.trip.pinfo = p.id || p.addr || p.url ? Object.assign({id:p.id||"", addr:p.addr||"", url:p.url||""}, p.lat ? {lat:p.lat, lon:p.lon} : {}) : null;
+  placeInput.value = p.name; save(); closePlaces(); renderPlaceLinks(); if (window.loadWeather) loadWeather();
 }
 placeInput.addEventListener("input", () => {
-  state.trip.pinfo = null; renderPlaceLinks();
+  state.trip.pinfo = null; state.trip.wx = []; renderPlaceLinks(); if (window.__wxReady) renderWx();
   clearTimeout(placeTimer); placeTimer = setTimeout(searchPlaces, 280);
 });
 placeInput.addEventListener("focus", () => { if (placeInput.value.trim() && !state.trip.pinfo) searchPlaces(); });
@@ -1737,6 +1774,7 @@ records = local.getData().records; renderRecords();
 
 const APP_ID = "trip", APP_NAME = "트립첵!";
 const NEWS = [
+  {v:"1.4.0", d:"2026. 10. 28.", items:["날씨 예보 표: 머무는 날마다 하늘 상태 · 비 확률 · 바람 · 최저/최고 기온, 비 오는 날은 주황으로 알려 줘요.","해외 여행지는 도시 이름(예: 오사카, 다낭)으로 찾아서 현지 날씨를 볼 수 있어요.","위쪽 칸 배치를 바꿨어요(왼쪽 출발일 · 몇 박 · 여행지 · 교통편, 오른쪽 날씨)."]},
   {v:"1.3.0", d:"2026. 10. 28.", items:["일정: 날짜별로 시간 · 할 일 · 메모를 적으면 시간 순으로 정리되고, 카카오맵 · 네이버 지도로 바로 열려요.","휴대폰 아래 메뉴를 기록 · 일정 · 체크 · 가족 · 설정 다섯 칸으로 나눴어요."]},
   {v:"1.2.0", d:"2026. 10. 28.", items:["돌아올 때 체크: 출발 때 챙긴 물건만 모아서, 숙소를 나서기 전에 한 번 더 체크해요.","되돌리기: 항목 빼기, 체크 모두 지우기, 목록 바꾸기를 한 뒤 몇 초 안에 [되돌리기]를 누르면 원래대로 돌아와요."]},
   {v:"1.1.0", d:"2026. 10. 27.", items:["준비물 세팅 공유: 우리 목록을 짧은 주소와 QR로 보내고, 받은 목록을 더하거나 통째로 바꿀 수 있어요.","업데이트 소식을 설정에서 볼 수 있어요.","자매 앱 캠첵!(캠핑 준비물)으로 바로 가는 버튼이 생겼어요."]},
@@ -2032,6 +2070,127 @@ document.getElementById("plans").addEventListener("submit", e => {
 ["tripNights", "tripStart"].forEach(id => document.getElementById(id).addEventListener("input", () => setTimeout(renderPlans, 0)));
 window.__plansReady = true;
 renderPlans();
+
+/* ---------- 날씨 예보 (Open-Meteo, 키 없이 무료) ----------
+   국내: 카카오에서 고른 여행지 위치 / 해외: 도시 이름으로 찾은 위치 → 머무는 날들의 하늘 · 비 · 바람 · 기온 */
+let wxTimer = null, wxSeq = 0;
+const ymd = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+function wxNote(html){ const el = document.getElementById("wxNote"); if (el) el.innerHTML = html || ""; }
+const WXNAME = c => c == null ? "" : c === 0 ? "맑음" : c <= 2 ? "구름 조금" : c === 3 ? "흐림" : c <= 48 ? "안개" : c <= 57 ? "이슬비" : c <= 67 ? "비" : c <= 77 ? "눈" : c <= 82 ? "소나기" : c <= 86 ? "눈 소나기" : "뇌우";
+const WXICON = c => {
+  const sun = '<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/>';
+  const cloud = '<path d="M7 18h10a4 4 0 0 0 0-8 5 5 0 0 0-9.6 1.5A3.3 3.3 0 0 0 7 18z"/>';
+  const rain = cloud.replace("18h", "15h").replace("0 0 7 18z", "0 0 7 15z") + '<path d="M9 18l-1 3M13 18l-1 3M17 18l-1 3"/>';
+  const snow = cloud.replace("18h", "15h").replace("0 0 7 18z", "0 0 7 15z") + '<path d="M9 19h.01M13 20h.01M17 19h.01"/>';
+  const body = c == null ? cloud : c === 0 ? sun : c <= 3 || c <= 48 ? cloud : (c >= 71 && c <= 77) || c === 85 || c === 86 ? snow : rain;
+  return `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+};
+
+async function loadWeather(){
+  const t = state.trip, p = t.pinfo, seq = ++wxSeq;
+  if (!p || !p.lat || !t.start){ renderWx(); wxNote(""); return; }
+  const st = new Date(t.start + "T00:00:00"), nights = Math.max(0, parseInt(t.nights, 10) || 0);
+  const en = new Date(st); en.setDate(en.getDate() + nights);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  if (en < today){ renderWx(); wxNote(""); return; }
+  wxNote("날씨 예보를 불러오는 중…");
+  try{
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${(+p.lat).toFixed(4)}&longitude=${(+p.lon).toFixed(4)}&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,wind_gusts_10m_max&wind_speed_unit=ms&timezone=auto&forecast_days=16`;
+    const r = await fetch(url); if (!r.ok) throw new Error(r.status);
+    const d = await r.json(); if (seq !== wxSeq) return;
+    const from = ymd(st), to = ymd(en), D = d.daily || {};
+    const idx = (D.time || []).map((x, i) => x >= from && x <= to ? i : -1).filter(i => i >= 0);
+    const nz = (a, i) => a && a[i] != null ? a[i] : null;
+    t.wx = idx.map(i => ({date:D.time[i], code:nz(D.weather_code, i), lo:nz(D.temperature_2m_min, i), hi:nz(D.temperature_2m_max, i),
+      pop:nz(D.precipitation_probability_max, i), rain:nz(D.precipitation_sum, i), wind:nz(D.wind_speed_10m_max, i), gust:nz(D.wind_gusts_10m_max, i)}));
+    save(); renderWx();
+    const lastDay = idx.length ? D.time[idx[idx.length - 1]] : "";
+    wxNote(idx.length ? `날씨 예보${lastDay < to ? `(${+lastDay.slice(5,7)}/${+lastDay.slice(8)}까지)` : ""} · 현지 날짜 기준 <button type="button" class="link" id="wxGo">다시</button>` : "");
+  }catch(e){ if (seq === wxSeq) wxNote(`날씨 예보를 불러오지 못했어요(${esc(e && e.message || "")}). <button type="button" class="link" id="wxGo">다시</button>`); }
+}
+window.loadWeather = loadWeather;
+function renderWx(){
+  const el = document.getElementById("wxDays"); if (!el) return;
+  const t = state.trip, w = t.wx || [];
+  const msg = text => `<table class="wx-table" aria-label="날씨 예보"><tbody><tr><td class="wx-empty">${text}</td></tr></tbody></table>`;
+  if (!t.start){ el.innerHTML = msg("출발일과 여행지를 넣으면<br>날씨 예보가 나와요"); return; }
+  el.dataset.mode = "";
+  if (!t.pinfo || !t.pinfo.lat){
+    if (document.getElementById("wxAddr")){ el.dataset.mode = "find"; return; }   // 찾는 중인 칸은 그대로 둠
+    el.dataset.mode = "find";
+    el.innerHTML = msg(`국내는 여행지 칸에서 카카오 검색으로 고르고,<br>해외나 검색에 없는 곳은 도시 이름·주소로 찾아 주세요.
+      <form class="wx-addr" id="wxAddr"><input class="field" id="wxAddrIn" placeholder="예: 오사카, 다낭, 제주시 애월읍" aria-label="도시 이름이나 주소"><button type="submit" class="chip">찾기</button></form><span class="wx-addr-msg" id="wxAddrMsg"></span><div class="wx-pick" id="wxPick"></div>`);
+    return;
+  }
+  const n = Math.max(0, parseInt(t.nights, 10) || 0), st = new Date(t.start + "T00:00:00");
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const lastDate = new Date(st); lastDate.setDate(lastDate.getDate() + n);
+  if (lastDate < today){ el.innerHTML = msg("지난 여행이에요"); return; }
+  const dates = Array.from({length:Math.min(n + 1, 5)}, (_, i) => { const x = new Date(st); x.setDate(x.getDate() + i); return x; });
+  const cells = dates.map(dt => {
+    const key = ymd(dt), d = w.find(x => x.date === key);
+    const head = `<b>${dt.getMonth() + 1}/${dt.getDate()}<i>(${DAYNAMES[dt.getDay()]})</i></b>`;
+    if (!d) return {warn:[], day:"", tip:"", top:`${head}<span class="wx-none">아직 예보 전</span>`, bot:`<span class="wx-none">- / -</span>`};
+    const windy = (d.wind != null && d.wind >= 10) || (d.gust != null && d.gust >= 17);
+    const wet = (d.pop != null && d.pop >= 60) || (d.rain != null && d.rain >= 5);
+    const cold = d.lo != null && d.lo <= 0;
+    const warn = [wet ? "비" : "", windy ? "바람" : "", cold ? "영하" : ""].filter(Boolean);
+    const tip = `${WXNAME(d.code)}` + (d.pop != null ? ` · 비 ${d.pop}%` : "") + (d.rain ? ` ${Math.round(d.rain * 10) / 10}mm` : "") + (d.gust ? ` · 돌풍 ${Math.round(d.gust)}m/s` : "");
+    return {warn, day:`${dt.getMonth() + 1}/${dt.getDate()}`, tip,
+      top:`${head}<span class="wx-sky ${wet ? "hot" : ""}">${WXICON(d.code)}${esc(WXNAME(d.code))}${d.pop != null && d.pop >= 30 ? ` ${d.pop}%` : ""}</span><span class="${windy ? "hot" : ""}">바람 ${d.wind != null ? Math.round(d.wind) : "-"}m/s</span>`,
+      bot:`<span class="${cold ? "hot" : ""}">${d.lo != null ? Math.round(d.lo) : "-"}°</span> / ${d.hi != null ? Math.round(d.hi) : "-"}°`};
+  });
+  const none = cells.every(c => !c.tip);
+  const notes = cells.filter(c => c.warn.length).map(c => `${c.day} ${c.warn.join("·")}`);
+  el.innerHTML = `<table class="wx-table" aria-label="날씨 예보"><tbody>
+    <tr>${cells.map(c => `<td class="${c.warn.length ? "warn" : ""}"${c.tip ? ` title="${esc(c.tip)}"` : ""}>${c.top}</td>`).join("")}</tr>
+    <tr class="wx-temp">${none ? `<td colspan="${cells.length}" class="wx-empty">아직 예보가 없어요 · 출발 2주 전부터 나와요</td>` : cells.map(c => `<td class="${c.warn.length ? "warn" : ""}">${c.bot}</td>`).join("")}</tr>
+  </tbody></table>${notes.length ? `<p class="wx-w">주의 ${esc(notes.join(" · "))}${cells.some(c => c.warn.includes("비")) ? " — 우산·우비 챙기기" : ""}</p>` : ""}`;
+}
+/* 도시 이름(해외) · 주소(국내)로 위치 찾기 */
+async function findLocations(q){
+  const out = [];
+  try{   // 국내 주소는 카카오
+    const ps = await loadKakao();
+    if (ps){
+      const d = await new Promise(res => new kakao.maps.services.Geocoder().addressSearch(q, (data, status) => res(status === kakao.maps.services.Status.OK ? data : [])));
+      d.slice(0, 2).forEach(x => out.push({name:(x.road_address && x.road_address.address_name) || x.address_name, sub:"국내 주소", lat:+x.y, lon:+x.x}));
+    }
+  }catch(e){}
+  try{   // 도시 이름(해외 포함)은 Open-Meteo 지명 검색
+    const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=ko&format=json`);
+    const d = r.ok ? await r.json() : {};
+    (d.results || []).forEach(x => out.push({name:x.name, sub:[x.admin1, x.country].filter(Boolean).join(", "), lat:x.latitude, lon:x.longitude}));
+  }catch(e){}
+  return out;
+}
+let wxFound = [];
+function pickLocation(i){
+  const f = wxFound[i]; if (!f) return;
+  const t = state.trip;
+  t.pinfo = {id:"", addr:f.sub === "국내 주소" ? f.name : [f.name, f.sub].filter(Boolean).join(", "), url:"", lat:f.lat, lon:f.lon};
+  if (!t.place){ t.place = f.name; placeInput.value = f.name; }
+  save(); closePlaces(); renderPlaceLinks(); loadWeather();
+}
+const wxBox = document.getElementById("wxDays");
+wxBox.addEventListener("submit", async e => {
+  if (e.target.id !== "wxAddr") return;
+  e.preventDefault();
+  const q = document.getElementById("wxAddrIn").value.trim(), m = document.getElementById("wxAddrMsg"), pick = document.getElementById("wxPick");
+  if (!q){ document.getElementById("wxAddrIn").focus(); return; }
+  m.textContent = "찾는 중…"; pick.innerHTML = "";
+  wxFound = await findLocations(q);
+  if (!wxFound.length){ m.textContent = "찾지 못했어요. 영어 도시 이름(예: Osaka)이나 시·군과 도로명까지 적어 보세요."; return; }
+  if (wxFound.length === 1){ pickLocation(0); return; }
+  m.textContent = "어느 곳인가요?";
+  pick.innerHTML = wxFound.map((f, i) => `<button type="button" data-i="${i}">${esc(f.name)}${f.sub ? `<small>${esc(f.sub)}</small>` : ""}</button>`).join("");
+});
+wxBox.addEventListener("click", e => { const b = e.target.closest(".wx-pick button"); if (b) pickLocation(Number(b.dataset.i)); });
+document.getElementById("wxNote").addEventListener("click", e => { if (e.target.id === "wxGo") loadWeather(); });
+["tripStart", "tripNights"].forEach(id => document.getElementById(id).addEventListener("input", () => { renderWx(); clearTimeout(wxTimer); wxTimer = setTimeout(loadWeather, 600); }));
+window.__wxReady = true;
+renderWx();
+setTimeout(loadWeather, 800);
 </script>
 <script type="module" src="app-firebase.js"></script>
 </body>
