@@ -484,7 +484,7 @@ body.dragging,body.dragging *{user-select:none!important;-webkit-user-select:non
 .plist{gap:6px}
 .plist li.plan{align-items:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 .plist li.plan:hover{background:var(--bg)}
-.ptime{flex:none;font-family:var(--f-mono);font-size:12.5px;font-weight:700;color:var(--on-forest);background:var(--forest);border-radius:8px;padding:3px 8px;margin-top:2px}
+.ptime{flex:none;font-family:var(--f-mono);font-size:14.5px;font-weight:700;color:var(--on-forest);background:var(--forest);border-radius:8px;padding:3px 8px;margin-top:2px}
 .mtxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;word-break:keep-all}
 .mtxt b{font-size:15px;color:var(--ink)}
 .mtxt span{font-size:13px;color:var(--muted)}
@@ -494,6 +494,10 @@ body.dragging,body.dragging *{user-select:none!important;-webkit-user-select:non
 .padd #planMemo,.padd .primary{grid-column:1/-1}
 .padd .primary{padding:10px}
 .padd .field{font-size:14px;padding:9px 12px;min-width:0}
+.ptime-in{position:relative;display:block;width:132px}
+.ptime-in small{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:11.5px;font-weight:800;color:var(--accent);pointer-events:none}
+.ptime-in .field{width:100%;padding-left:44px;font-family:var(--f-mono);font-size:19px!important;font-weight:700;letter-spacing:.02em}
+.ptime-in .field::placeholder{font-size:17px;font-weight:600}
 @media (min-width:900px){.padd{grid-template-columns:auto 1fr 1.3fr auto}.padd #planMemo,.padd .primary{grid-column:auto}}
 
 /* 장소 링크 줄바꿈 다듬기 */
@@ -2030,6 +2034,7 @@ function dayLabel(d){
 }
 function normTime(v){
   v = String(v || "").trim(); if (!v) return "";
+  if (/^\d{3,4}$/.test(v)) v = v.padStart(4, "0").slice(0, 2) + ":" + v.padStart(4, "0").slice(2);   // 930 → 09:30
   const m = v.match(/^(\d{1,2})[:시.\s]?(\d{0,2})/); if (!m) return v;
   return String(Math.min(23, +m[1])).padStart(2, "0") + ":" + String(Math.min(59, +(m[2] || 0))).padStart(2, "0");
 }
@@ -2054,7 +2059,7 @@ function renderPlans(){
     <ul class="plist">${list.length ? list.map(p => `<li class="plan"><span class="ptime">${esc(p.time || "언제든")}</span><div class="mtxt"><b>${esc(p.title)}</b>${p.memo ? `<span>${esc(p.memo)}</span>` : ""}<span class="plinks">${placeLinksHTML(p.title)}</span></div><button type="button" class="pen trash pdel" data-p="${p.id}" aria-label="${esc(p.title)} 빼기" title="빼기">${TRASH}</button></li>`).join("")
       : `<li class="mempty">아직 이 날 일정이 없어요.</li>`}</ul>
     <form class="padd" id="planAdd">
-      <input class="field" id="planTime" type="time" aria-label="시간">
+      <label class="ptime-in"><small>시간</small><input class="field" id="planTime" type="text" inputmode="numeric" maxlength="5" placeholder="09:30" aria-label="시간 (숫자 4자리)"></label>
       <input class="field" id="planTitle" placeholder="할 일·장소 (예: 오사카성)" aria-label="할 일">
       <input class="field" id="planMemo" placeholder="메모 (예: 입장권 미리 사기)" aria-label="메모">
       <button type="submit" class="primary">넣기</button>
@@ -2075,6 +2080,12 @@ document.getElementById("plans").addEventListener("submit", e => {
   const t = document.getElementById("planTitle"); if (t) t.focus();
 });
 ["tripNights", "tripStart"].forEach(id => document.getElementById(id).addEventListener("input", () => setTimeout(renderPlans, 0)));
+/* 시간 칸: 숫자만 치면 저절로 09:30 모양으로 */
+document.getElementById("plans").addEventListener("input", e => {
+  if (e.target.id !== "planTime") return;
+  const d = e.target.value.replace(/\D/g, "").slice(0, 4);
+  e.target.value = d.length === 4 ? d.slice(0, 2) + ":" + d.slice(2) : d;   // 4자리가 되면 09:30 모양
+});
 window.__plansReady = true;
 renderPlans();
 
