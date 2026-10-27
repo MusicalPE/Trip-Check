@@ -1,6 +1,4 @@
 // 트립첵! 전용 파이어베이스(trip--check) 보안 규칙 — 이 파일 내용을 통째로 붙여 넣고 [게시]
-rules_version 줄부터 끝까지 통째로 붙여 넣은 뒤 [게시]를 눌러 주세요.
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
