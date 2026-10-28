@@ -484,6 +484,10 @@ body.dragging,body.dragging *{user-select:none!important;-webkit-user-select:non
 .plist{gap:6px}
 .plist li.plan{align-items:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 .plist li.plan:hover{background:var(--bg)}
+.plist li.plan.editing{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+.plist li.plan .pen{align-self:center}
+.padd .ghost-btn{grid-column:1/-1;padding:9px;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);font:inherit;font-weight:700;border-radius:12px;cursor:pointer}
+.padd.editing .primary{background:var(--accent);border-color:var(--accent)}
 .ptime{flex:none;font-family:var(--f-mono);font-size:14.5px;font-weight:700;color:var(--on-forest);background:var(--forest);border-radius:8px;padding:3px 8px;margin-top:2px}
 .mtxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;word-break:keep-all}
 .mtxt b{font-size:15px;color:var(--ink)}
@@ -498,7 +502,7 @@ body.dragging,body.dragging *{user-select:none!important;-webkit-user-select:non
 .ptime-in small{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:11.5px;font-weight:800;color:var(--accent);pointer-events:none}
 .ptime-in .field{width:100%;padding-left:44px;font-family:var(--f-mono);font-size:19px!important;font-weight:700;letter-spacing:.02em}
 .ptime-in .field::placeholder{font-size:17px;font-weight:600}
-@media (min-width:900px){.padd{grid-template-columns:auto 1fr 1.3fr auto}.padd #planMemo,.padd .primary{grid-column:auto}}
+@media (min-width:900px){.padd{grid-template-columns:auto 1fr 1.3fr auto}.padd #planMemo,.padd .primary{grid-column:auto}.padd.editing{grid-template-columns:auto 1fr 1.3fr auto auto}.padd .ghost-btn{grid-column:auto}}
 
 /* 장소 링크 줄바꿈 다듬기 */
 .place-links{flex-wrap:wrap;gap:2px 8px;word-break:keep-all;line-height:1.5}
@@ -2046,6 +2050,7 @@ function normTime(v){
   const m = v.match(/^(\d{1,2})[:시.\s]?(\d{0,2})/); if (!m) return v;
   return String(Math.min(23, +m[1])).padStart(2, "0") + ":" + String(Math.min(59, +(m[2] || 0))).padStart(2, "0");
 }
+let planEdit = null;
 function delPlan(id){
   const before = snapState(), p = state.plans.find(x => x.id === id); if (!p) return;
   state.plans = state.plans.filter(x => x.id !== id); save(); render();
@@ -2058,31 +2063,44 @@ function renderPlans(){
   const days = planDays(); if (planDay > days) planDay = 1;
   const plans = state.plans || [], folded = fold.has("plans");
   const list = plans.filter(p => p.day === planDay).sort((a, b) => (a.time || "99") < (b.time || "99") ? -1 : 1);
+  const ed = planEdit && plans.find(p => p.id === planEdit && p.day === planDay); if (!ed) planEdit = null;
   el.className = "zone plans tabbed v-plan" + (folded ? " folded" : "");
   el.innerHTML = `<div class="zone-head"><div class="zh-text"><h2><button type="button" class="zfold pfold" aria-expanded="${!folded}">일정</button></h2><div class="sub">날짜별로 시간과 할 일을 적어 두세요</div></div>
     <button type="button" class="cnt zfold pfold" aria-expanded="${!folded}">${plans.length}개<svg class="chev" viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
     <div class="mbody">
     <div class="mdays">${Array.from({length:days}, (_, i) => i + 1).map(d => `<button type="button" class="mday" data-d="${d}" aria-pressed="${d === planDay}">${d}일차<small>${plans.filter(p => p.day === d).length || ""}</small></button>`).join("")}</div>
     <div class="mdate">${esc(dayLabel(planDay))}</div>
-    <ul class="plist">${list.length ? list.map(p => `<li class="plan"><span class="ptime">${esc(p.time || "언제든")}</span><div class="mtxt"><b>${esc(p.title)}</b>${p.memo ? `<span>${esc(p.memo)}</span>` : ""}<span class="plinks">${placeLinksHTML(p.title)}</span></div><button type="button" class="pen trash pdel" data-p="${p.id}" aria-label="${esc(p.title)} 빼기" title="빼기">${TRASH}</button></li>`).join("")
+    <ul class="plist">${list.length ? list.map(p => `<li class="plan${p.id === planEdit ? " editing" : ""}"><span class="ptime">${esc(p.time || "언제든")}</span><div class="mtxt"><b>${esc(p.title)}</b>${p.memo ? `<span>${esc(p.memo)}</span>` : ""}<span class="plinks">${placeLinksHTML(p.title)}</span></div><button type="button" class="pen pedit" data-p="${p.id}" aria-label="${esc(p.title)} 고치기" title="고치기">${PENCIL}</button><button type="button" class="pen trash pdel" data-p="${p.id}" aria-label="${esc(p.title)} 빼기" title="빼기">${TRASH}</button></li>`).join("")
       : `<li class="mempty">아직 이 날 일정이 없어요.</li>`}</ul>
-    <form class="padd" id="planAdd">
-      <label class="ptime-in"><small>시간</small><input class="field" id="planTime" type="text" inputmode="numeric" maxlength="5" placeholder="09:30" aria-label="시간 (숫자 4자리)"></label>
-      <input class="field" id="planTitle" placeholder="할 일·장소 (예: 오사카성)" aria-label="할 일">
-      <input class="field" id="planMemo" placeholder="메모 (예: 입장권 미리 사기)" aria-label="메모">
-      <button type="submit" class="primary">넣기</button>
+    <form class="padd${ed ? " editing" : ""}" id="planAdd">
+      <label class="ptime-in"><small>시간</small><input class="field" id="planTime" type="text" inputmode="numeric" maxlength="5" placeholder="09:30" aria-label="시간 (숫자 4자리)" value="${ed ? esc(ed.time || "") : ""}"></label>
+      <input class="field" id="planTitle" placeholder="할 일·장소 (예: 오사카성)" aria-label="할 일" value="${ed ? esc(ed.title) : ""}">
+      <input class="field" id="planMemo" placeholder="메모 (예: 입장권 미리 사기)" aria-label="메모" value="${ed ? esc(ed.memo || "") : ""}">
+      <button type="submit" class="primary">${ed ? "고치기" : "넣기"}</button>${ed ? `<button type="button" class="ghost-btn pcancel">취소</button>` : ""}
     </form></div>`;
 }
 document.getElementById("plans").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   if (b.classList.contains("pfold")){ toggleFold("plans"); return; }
-  if (b.classList.contains("mday")){ planDay = Number(b.dataset.d); renderPlans(); return; }
-  if (b.classList.contains("pdel")){ delPlan(b.dataset.p); return; }
+  if (b.classList.contains("mday")){ planDay = Number(b.dataset.d); planEdit = null; renderPlans(); return; }
+  if (b.classList.contains("pdel")){ if (planEdit === b.dataset.p) planEdit = null; delPlan(b.dataset.p); return; }
+  if (b.classList.contains("pedit")){
+    planEdit = planEdit === b.dataset.p ? null : b.dataset.p; renderPlans();
+    const t = document.getElementById("planTitle");
+    if (planEdit && t){ t.scrollIntoView({block:"center", behavior:"smooth"}); t.focus({preventScroll:true}); }
+    return;
+  }
+  if (b.classList.contains("pcancel")){ planEdit = null; renderPlans(); return; }
 });
 document.getElementById("plans").addEventListener("submit", e => {
   e.preventDefault();
   const title = document.getElementById("planTitle").value.trim();
   if (!title){ document.getElementById("planTitle").focus(); return; }
+  if (planEdit){
+    const p = state.plans.find(x => x.id === planEdit); planEdit = null;
+    if (p){ p.time = normTime(document.getElementById("planTime").value); p.title = title; p.memo = document.getElementById("planMemo").value.trim(); save(); render(); toast("일정을 고쳤어요."); }
+    return;
+  }
   (state.plans || (state.plans = [])).push({id:uid(), day:planDay, time:normTime(document.getElementById("planTime").value), title, memo:document.getElementById("planMemo").value.trim()});
   save(); render(); toast("일정에 넣었어요.");
   const t = document.getElementById("planTitle"); if (t) t.focus();
