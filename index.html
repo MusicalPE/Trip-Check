@@ -638,9 +638,39 @@ li.imp.on .must{opacity:.4}
   .mainc .grid{grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px}
   .mainc .grid .zone{padding:16px 14px 14px}
 }
+/* ---------- 출력: A4 한 장 ---------- */
+#printSheet{display:none}
+#printSheet.measure{display:block;position:fixed;left:-10000px;top:0;width:718px;visibility:hidden}
+.ps{--pf:11px;--pc:3;font-family:var(--f-body,"Nanum Gothic",sans-serif);color:#111;font-size:var(--pf);line-height:1.35;background:#fff}
+.ps-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:2px solid #111;padding-bottom:5px;margin-bottom:8px}
+.ps-head h1{margin:0;font-size:calc(var(--pf) * 1.9);font-family:"Do Hyeon",sans-serif;font-weight:400;letter-spacing:-.01em}
+.ps-head .ps-info{font-size:calc(var(--pf) * 1.05);text-align:right}
+.ps-cols{column-count:var(--pc);column-gap:14px}
+.ps-zone{break-inside:avoid;margin:0 0 7px}
+.ps-zone h2{margin:0 0 2px;font-size:calc(var(--pf) * 1.12);border-bottom:1px solid #999;padding-bottom:1px;display:flex;justify-content:space-between}
+.ps-zone h2 small{font-weight:400;color:#555;font-size:calc(var(--pf) * .9)}
+.ps-zone ul{list-style:none;margin:0;padding:0}
+.ps-zone li{display:flex;gap:5px;align-items:flex-start;padding:1px 0;break-inside:avoid;word-break:keep-all}
+.ps-box{flex:none;width:calc(var(--pf) * .95);height:calc(var(--pf) * .95);border:1.2px solid #111;border-radius:2px;margin-top:calc(var(--pf) * .17)}
+.ps-zone li.ps-imp{font-weight:800}
+.ps-zone li.ps-imp .ps-box{border-width:2px}
+.ps-extra{margin-top:8px;border-top:1.5px solid #111;padding-top:6px}
+.ps-extra h2{margin:0 0 3px;font-size:calc(var(--pf) * 1.12)}
+.ps-day{break-inside:avoid;margin:0 0 5px}
+.ps-day b{display:block;font-size:calc(var(--pf) * 1.0)}
+.ps-day p{margin:0;padding-left:4px}
+.ps-memo{margin-top:8px;border:1px solid #999;border-radius:4px;min-height:calc(var(--pf) * 4.5);padding:3px 6px;color:#777;font-size:calc(var(--pf) * .9)}
+.ps-foot{margin-top:6px;font-size:calc(var(--pf) * .85);color:#666;text-align:right}
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  html,body{background:#fff!important}
+  body > *:not(#printSheet){display:none!important}
+  #printSheet{display:block!important;position:static!important;visibility:visible!important;width:auto!important}
+}
 </style>
 </head>
 <body>
+<div id="printSheet" aria-hidden="true"></div>
 <div class="wrap">
   <div class="two"><aside class="side">
   <header class="tabbed v-home">
@@ -693,6 +723,7 @@ li.imp.on .must{opacity:.4}
     <span class="chips" id="labelChips"></span>
     <button class="chip ghost" id="labelSet" aria-expanded="false">상황 설정</button>
     <button class="chip" id="fHide" aria-pressed="false">챙긴 것 숨기기</button>
+    <button class="chip ghost" id="printBtn" title="지금 보이는 목록을 A4 한 장으로 출력해요">출력</button>
     <span class="spacer"></span>
     <span id="resetBox"></span>
   </div>
@@ -1883,6 +1914,7 @@ records = local.getData().records; renderRecords();
 
 const APP_ID = "trip", APP_NAME = "트립첵!";
 const NEWS = [
+  {v:"1.8.0", d:"2026. 11. 11.", items:["출력: 체크 목록 위 [출력]을 누르면 지금 보이는 목록(상황 설정 반영)을 A4 한 장에 맞춰 뽑아요. 일정 · 비용과 메모 칸도 함께 들어가요."]},
   {v:"1.7.0", d:"2026. 11. 8.", items:["항공 · 숙박 등 여행 전체 비용: 날짜와 상관없는 항공권 · 숙박 · 렌터카 · 보험 같은 비용을 일정 아래에 따로 적고, 정산 합계에 함께 들어가요.","여행 기록을 남기면 정산 내역(합계 · 1인당 · 항목별)도 기록에 함께 들어가요."]},
   {v:"1.6.0", d:"2026. 11. 8.", items:["일정 비용: 일정마다 비용과 통화(원 · 엔 · 달러 등)를 적을 수 있어요.","정산: 일정 아래 [정산]을 누르면 날짜별 · 전체 비용을 더해 주고, 나눌 사람 수를 적으면 1인당 금액도 알려 줘요. 정산 내용을 복사해 단톡방에 붙여 넣을 수 있어요."]},
   {v:"1.5.0", d:"2026. 11. 3.", items:["넓은 화면(노트북 · PC · 가로 태블릿)에서는 2단으로 보여요. 왼쪽에 출발일 · 날씨 · 일정, 오른쪽에 체크 목록이 바로 나와요.","일정을 연필 버튼으로 고칠 수 있어요."]},
@@ -2430,6 +2462,48 @@ document.getElementById("wxNote").addEventListener("click", e => { if (e.target.
 window.__wxReady = true;
 renderWx();
 setTimeout(loadWeather, 800);
+/* ---------- 출력: 지금 보이는 목록(상황 설정 반영)을 A4 한 장에 맞춰 ---------- */
+function buildPrint(){
+  const t = state.trip || {}, back = inBack();
+  const info = [];
+  if (t.start){ const d = new Date(t.start + "T00:00:00"); if (!isNaN(d)) info.push(`${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.(${"일월화수목금토"[d.getDay()]}) 출발`); }
+  if (t.nights !== undefined && t.nights !== "") info.push(`${esc(t.nights)}박`);
+  if (t.place) info.push(esc(t.place));
+  const zones = state.zones.map(z => ({z, it: viewItems(z)})).filter(x => x.it && x.it.length);
+  const total = zones.reduce((n, x) => n + x.it.length, 0);
+  let extra = "";
+  const pl = (state.plans || []), cs = (state.costs || []);
+  if (pl.length || cs.length){
+    let h = "";
+    const mx = Math.max(planDays(), ...pl.map(p => p.day));
+    for (let d = 1; d <= mx; d++){
+      const dl = pl.filter(p => p.day === d).sort((a, b) => (a.time || "99") < (b.time || "99") ? -1 : 1); if (!dl.length) continue;
+      h += `<div class="ps-day"><b>${esc(dayLabel(d))}</b>${dl.map(p => `<p>${p.time ? esc(p.time) + " " : ""}${esc(p.title)}${p.memo ? ` <span style="color:#555">(${esc(p.memo)})</span>` : ""}${p.cost ? ` · ${esc(money(p.cost, p.cur))}` : ""}</p>`).join("")}</div>`;
+    }
+    if (cs.length) h += `<div class="ps-day"><b>항공 · 숙박 등</b>${cs.map(c => `<p>${esc(c.kind)}${c.title ? " (" + esc(c.title) + ")" : ""} · ${esc(money(c.cost, c.cur))}</p>`).join("")}</div>`;
+    const tot = sumBy(allCosts());
+    if (Object.keys(tot).length) h += `<div class="ps-day"><b>비용 합계</b><p>${esc(sumText(tot))}</p></div>`;
+    extra = `<div class="ps-extra"><h2>일정</h2><div class="ps-cols">${h}</div></div>`;
+  }
+  return `<div class="ps"><div class="ps-head"><h1>${APP_NAME} ${back ? "철수 체크리스트" : "준비물 체크리스트"}</h1><div class="ps-info">${info.join(" · ") || "출발일 · 몇 박 · 여행지: ____________"}<br>모두 ${total}개</div></div>
+    <div class="ps-cols">${zones.map(({z, it}) => `<section class="ps-zone"><h2>${esc(z.name)}<small>${it.length}</small></h2><ul>${it.map(i => `<li class="${i.imp ? "ps-imp" : ""}"><span class="ps-box"></span><span>${esc(i.t)}${i.imp ? " (꼭!)" : ""}</span></li>`).join("")}</ul></section>`).join("")}</div>
+    ${back ? "" : extra}
+    <div class="ps-memo">메모</div>
+    <div class="ps-foot">${APP_NAME} · musicalpe.github.io/Trip-Check</div></div>`;
+}
+function printList(){
+  const el = document.getElementById("printSheet");
+  el.innerHTML = buildPrint(); el.className = "measure";
+  const ps = el.firstElementChild, PAGE = 960;   // A4(10mm 여백) 높이 ≈ 1047px, 인쇄 때 단 나눔이 조금 달라져 여유를 둠
+  const tries = [[11.5,3],[11,3],[10.5,3],[10,3],[10,4],[9.5,4],[9,4],[8.5,4],[8,4],[7.5,4],[7,5],[6.5,5],[6,5]];
+  for (const [f, c] of tries){
+    ps.style.setProperty("--pf", f + "px"); ps.style.setProperty("--pc", c);
+    if (ps.scrollHeight <= PAGE) break;
+  }
+  el.className = "";
+  setTimeout(() => window.print(), 50);
+}
+document.getElementById("printBtn").addEventListener("click", printList);
 /* ---------- 넓은 화면 2단: 일정 칸을 왼쪽으로 옮김 ---------- */
 (function(){
   const mq = matchMedia("(min-width:1100px)");
