@@ -784,6 +784,7 @@ li.imp.on .must{opacity:.4}
 
   <section class="pane tabbed v-set mobile-only" id="setTab" aria-labelledby="setTabTitle">
     <h2 id="setTabTitle">설정</h2>
+    <div class="set-row"><div><b>기록하면 일정 · 비용도 비우기</b><p>여행을 기록할 때 체크와 함께 일정, 비용도 비워요.<br>끄면 다음 여행에도 그대로 남아요.</p></div><button class="chip" id="clearPlanSet" aria-pressed="true">켜짐</button></div>
     <div class="set-row"><div><b>처음 목록으로 되돌리기</b><p>고친 구역·항목을 모두 처음 목록으로 바꿔요.</p></div><span id="defaultBox2"></span></div>
     <div class="set-row"><div><b>계정·자료 관리</b><p>기록 내려받기, 가족 공간에서 나가기, 계정 지우기</p></div><button class="chip" id="manageSet">열기</button></div>
     <div class="set-row"><div><b>자매 앱 캠첵!</b><p>캠핑 준비물도 같은 방식으로 챙겨요.<br>로그인은 따로 한 번 해요.</p></div><a class="chip" href="https://musicalpe.github.io/Cam-Check/">열기</a></div>
@@ -903,7 +904,7 @@ function normalize(){
     delete z.tag;
     z.items.forEach(i => { if (!Array.isArray(i.g)) i.g = i.c ? ["cold"] : []; delete i.c; });
   });
-  state.f = {hide: !!f.hide};
+  state.f = {hide: !!f.hide, keepPlans: !!f.keepPlans};
 }
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -1075,6 +1076,7 @@ function closeQuick(){ quick = null; render(); }
 
 
 function render(){
+  if (typeof syncClearPlan === "function") syncClearPlan();
   const grid = document.getElementById("grid");
   grid.innerHTML = state.zones.map(zoneView).join("") + '<button class="zone-new" id="zoneNew">+ 구역 추가</button>';
   setupDrag();
@@ -1661,17 +1663,28 @@ document.getElementById("saveRec").addEventListener("click", () => {
     records = l; renderRecords();
     btn.disabled = false; btn.textContent = "이번 여행 기록하기";
     resetForNext();
-    msg.textContent = `${rec.date.replace(/-/g,".")} 기록을 ${REMOTE?"가족 공간에 ":""}남기고, 다음 여행 준비로 체크 · 메모 · 일정를 비웠어요.`;
+    msg.textContent = `${rec.date.replace(/-/g,".")} 기록을 ${REMOTE?"가족 공간에 ":""}남기고, 다음 여행 준비로 체크 · 메모${state.f && state.f.keepPlans ? "" : " · 일정 · 비용"}을 비웠어요.`;
   }).catch(() => {
     btn.disabled = false; btn.textContent = "이번 여행 기록하기";
     msg.className = "msg err"; msg.textContent = "기록하지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요.";
   });
 });
+function syncClearPlan(){
+  const b = document.getElementById("clearPlanSet"); if (!b) return;
+  const on = !(state.f && state.f.keepPlans); b.setAttribute("aria-pressed", on); b.textContent = on ? "켜짐" : "꺼짐";
+}
+document.getElementById("clearPlanSet").addEventListener("click", () => {
+  state.f = state.f || {}; state.f.keepPlans = !state.f.keepPlans; save(); syncClearPlan();
+  toast(state.f.keepPlans ? "기록해도 일정 · 비용은 남겨 둘게요." : "기록하면 일정 · 비용도 비울게요.");
+});
 /* 기록을 남기면 다음 여행 준비로 바로 비움(기록에 다 남아 있음) — 잘못 눌렀으면 되돌리기 */
 function resetForNext(){
   const before = snapState(), keep = {memo:state.memo, trip:state.trip};
-  state.memo = ""; state.trip = {}; state.plans = []; state.costs = []; settleOpen = false; costOpen = false; save(); clearChecks(); fillTrip(); render();
-  offerUndo("체크 · 메모 · 일정를 비웠어요.", before);
+  const withPlans = !(state.f && state.f.keepPlans);   // 설정에서 끌 수 있음(처음엔 켜짐)
+  state.memo = ""; state.trip = {};
+  if (withPlans){ state.plans = []; state.costs = []; settleOpen = false; costOpen = false; }
+  save(); clearChecks(); fillTrip(); render();
+  offerUndo(withPlans ? "체크 · 메모 · 일정 · 비용을 비웠어요." : "체크 · 메모를 비웠어요.", before);
   const ub = document.querySelector("#undoBar button");
   if (ub){ const prev = ub.onclick; ub.onclick = () => { state.memo = keep.memo; state.trip = keep.trip; fillTrip(); prev(); }; }
   clearTimeout(undoTimer); undoTimer = setTimeout(() => { const u = document.getElementById("undoBar"); if (u) u.hidden = true; }, 15000);   // 기록 직후라 조금 더 길게
@@ -1958,6 +1971,7 @@ records = local.getData().records; renderRecords();
 
 const APP_ID = "trip", APP_NAME = "트립첵!";
 const NEWS = [
+  {v:"2.2.0", d:"2026. 11. 13.", items:["설정 → [기록하면 일정 · 비용도 비우기]를 끄면 여행을 기록해도 일정과 비용이 다음 여행에 그대로 남아요. 처음에는 켜져 있어요."]},
   {v:"2.1.0", d:"2026. 11. 13.", items:["[이번 여행 기록하기]를 누르면 다음 여행 준비로 체크 · 메모 · 일정가 바로 비워져요. 잘못 눌렀으면 아래 [되돌리기]로 돌릴 수 있어요."]},
   {v:"2.0.0", d:"2026. 11. 13.", items:["휴대폰 · 태블릿에서는 [순서 편집]을 눌렀을 때만 항목 · 구역을 끌어서 옮길 수 있어요. 목록을 스크롤하다 항목이 움직이는 일이 없어요."]},
   {v:"1.9.0", d:"2026. 11. 13.", items:["의견 · 오류 보내기: 설정에서 불편한 점이나 바라는 기능을 바로 보낼 수 있어요. 로그인하지 않아도 돼요.","날씨 예보를 이 기기에 잠깐 두고 다시 써서 더 빨리 떠요."]},
