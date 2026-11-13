@@ -2328,7 +2328,7 @@ function renderPlans(){
       : `<li class="mempty">아직 이 날 일정이 없어요.</li>`}</ul>
     <form class="padd${ed ? " editing" : ""}" id="planAdd">
       <label class="ptime-in"><small>시간</small><input class="field" id="planTime" type="text" inputmode="numeric" maxlength="5" placeholder="09:30" aria-label="시간 (숫자 4자리)" value="${ed ? esc(ed.time || "") : ""}"></label>
-      <input class="field" id="planTitle" placeholder="할 일·장소 (예: 오사카성)" aria-label="할 일" value="${ed ? esc(ed.title) : ""}">
+      <input class="field" id="planTitle" placeholder="할 일·장소 (예: 성산일출봉)" aria-label="할 일" value="${ed ? esc(ed.title) : ""}">
       <input class="field" id="planMemo" placeholder="메모 (예: 입장권 미리 사기)" aria-label="메모" value="${ed ? esc(ed.memo || "") : ""}">
       <div class="pcost-in"><label><small>비용</small><input class="field" id="planCost" type="text" inputmode="decimal" placeholder="선택" aria-label="비용" value="${ed && ed.cost ? esc(ed.cost.toLocaleString("ko-KR", {maximumFractionDigits: 2})) : ""}"></label>
         <select class="qzsel" id="planCur" aria-label="통화">${CURS.map(c => `<option ${c === lastCur ? "selected" : ""}>${c}</option>`).join("")}</select></div>
