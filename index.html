@@ -201,7 +201,7 @@ ul.items{min-height:10px}
 .drag-chosen{background:var(--surface);box-shadow:0 12px 30px rgba(0,0,0,.12)}
 .sortable-fallback{box-shadow:0 14px 32px rgba(0,0,0,.2);border-radius:16px;background:var(--surface);list-style:none;padding:12px}
 .qmove{display:inline-flex;gap:4px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:60;max-width:min(92vw,460px);
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:80;max-width:min(92vw,460px);
   background:var(--forest);color:var(--on-forest);font-size:14px;font-weight:600;line-height:1.5;padding:14px 20px;border-radius:16px;box-shadow:0 12px 35px rgba(44,108,166,.35);text-align:center;border:1px solid color-mix(in srgb,var(--on-forest) 20%,transparent)}
 .qmove button{font-size:12px;line-height:1;width:34px;height:30px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
 .qmove button:hover{border-color:var(--accent);color:var(--accent)}
@@ -480,6 +480,16 @@ a.chip{text-decoration:none;display:inline-block}
 .tk-chips button{min-height:42px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font:inherit;font-weight:800;font-size:15px;color:var(--ink);cursor:pointer}
 .tk-chips.tpl button{border-radius:99px}
 .tk-chips button[aria-pressed="true"]{background:var(--forest);border-color:var(--forest);color:var(--on-forest)}
+.tk-add{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1.5px solid var(--forest);border-radius:16px;padding:12px;margin-bottom:10px}
+.tk-add label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:var(--muted)}
+.tk-add input,.tk-add textarea{font:inherit;font-size:16px;font-weight:400;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical}
+.tk-add .tk-tr{display:flex;gap:8px}
+.tk-add .tk-tr a{flex:1;display:flex;align-items:center;justify-content:center;min-height:42px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--forest);font-weight:800;font-size:14px;text-decoration:none}
+.tk-add .tk-row2{display:flex;gap:8px}
+.tk-add .tk-row2 button{flex:1;min-height:46px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font:inherit;font-weight:800;font-size:15px;color:var(--muted);cursor:pointer}
+.tk-add .tk-row2 button.p{background:var(--forest);border-color:var(--forest);color:var(--on-forest)}
+.tk-empty{padding:18px;text-align:center;color:var(--muted);font-size:14px;border:1.5px dashed var(--line);border-radius:14px;word-break:keep-all}
+.tk-acts.sm button{min-height:40px;font-size:13.5px}
 .tk-note{margin:12px 2px 0;font-size:12.5px;color:var(--muted);line-height:1.5;word-break:keep-all}
 .tk-show{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;background:var(--bg)}
 .tk-them,.tk-me{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:safe center;padding:20px 22px;text-align:center;min-height:0;overflow:auto}
@@ -974,7 +984,7 @@ li.imp.on .must{opacity:.4}
 </div>
 
 <script src="kakao-config.js"></script>
-<script src="talk-data.js?v=2.5.1"></script>
+<script src="talk-data.js?v=2.6.0"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <script>
@@ -1075,7 +1085,7 @@ function applySettings(json){
 applySettings(local.getData().settings);
 
 function settingsObj(){   // 가족 공간에 올리는 목록·여행 정보 (체크는 한 칸씩 따로)
-  return JSON.parse(JSON.stringify({zones:state.zones, labels:state.labels, plans:state.plans || [], costs:state.costs || [], trip:state.trip, memo:state.memo, f:state.f}));
+  return JSON.parse(JSON.stringify({zones:state.zones, labels:state.labels, plans:state.plans || [], costs:state.costs || [], talk:state.talk || [], trip:state.trip, memo:state.memo, f:state.f}));
 }
 let saveTimer = null;
 function save(){
@@ -1820,7 +1830,7 @@ function applyFamily(d){
   if (isTyping() || saveTimer){ incoming = d; return; }
   incoming = null;
   const next = Object.assign({}, state);
-  ["zones","labels","plans","costs","trip","memo","f"].forEach(k => { if (d[k] !== undefined) next[k] = d[k]; });
+  ["zones","labels","plans","costs","talk","trip","memo","f"].forEach(k => { if (d[k] !== undefined) next[k] = d[k]; });
   next.checked = d.checked || {}; next.back = d.back || {};
   state = next; normalize();
   lsSet(KEY, JSON.stringify(state));
@@ -2087,8 +2097,9 @@ setTab("home");   // 늘 체크 화면부터
 records = local.getData().records; renderRecords();
 
 const APP_ID = "trip", APP_NAME = "트립첵!";
-const APP_VER = "2.5.1";   // 판 번호 — sw.js 의 CACHE 끝 번호와 같게(tests/run.sh check 가 확인)
+const APP_VER = "2.6.0";   // 판 번호 — sw.js 의 CACHE 끝 번호와 같게(tests/run.sh check 가 확인)
 const NEWS = [
+  {v:"2.6.0", d:"2026. 11. 22.", items:["여행 회화 '내 문장': 자주 쓰는 말을 직접 넣어 둘 수 있어요. [파파고로 번역] · [구글 번역]으로 번역해 붙여 넣고, 문장 만들기에서 만든 문장도 저장할 수 있어요. 가족 공간에서는 가족과 함께 써요."]},
   {v:"2.5.0", d:"2026. 11. 22.", items:["여행 회화 대답 듣기: '상대에게 보여 주기' 화면에서 상대가 자기 나라 말로 된 대답(네 · 있어요 · 오른쪽 · 저쪽 등)을 누르면 내 쪽에 한국어로 나와요. '얼마예요?'에는 상대가 금액을 숫자로 눌러 알려 줄 수 있어요."]},
   {v:"2.4.0", d:"2026. 11. 22.", items:["여행 회화: '일정' 화면의 [여행 회화]에서 8개 언어(일본어 · 영어 · 중국어 · 베트남어 · 태국어 · 프랑스어 · 스페인어 · 이탈리아어)로 공항 · 호텔 · 식당 · 길 찾기 · 쇼핑 · 급할 때 문장을 볼 수 있어요. 한글 발음과 소리 듣기, 낱말 골라 문장 만들기, 상대에게 보여 주기도 돼요."]},
   {v:"2.3.0", d:"2026. 11. 20.", items:["사용 안내 추가"]},
@@ -2357,7 +2368,8 @@ function tkRender(){
   document.getElementById("talkLang").innerHTML = TK.langs.map(l => `<option value="${l.id}" ${l.id === tkLang ? "selected" : ""}>${l.name}</option>`).join("");
   const th = document.getElementById("talkTh"); th.hidden = tkLang !== "th";
   th.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.g === tkGender()));
-  document.getElementById("talkTabs").innerHTML = TK.scenes.map((sc, i) => `<button type="button" role="tab" data-sc="${i}" aria-selected="${tkView === "list" && i === tkScene}">${esc(sc.name)}</button>`).join("") + `<button type="button" role="tab" data-sc="make" aria-selected="${tkView === "make"}">문장 만들기</button>`;
+  document.getElementById("talkTabs").innerHTML = `<button type="button" role="tab" data-sc="mine" aria-selected="${tkView === "mine"}">내 문장</button>` + TK.scenes.map((sc, i) => `<button type="button" role="tab" data-sc="${i}" aria-selected="${tkView === "list" && i === tkScene}">${esc(sc.name)}</button>`).join("") + `<button type="button" role="tab" data-sc="make" aria-selected="${tkView === "make"}">문장 만들기</button>`;
+  if (tkView === "mine"){ tkMineRender(lang); return; }
   if (tkView === "list"){
     const sc = TK.scenes[tkScene];
     tkBody.innerHTML = `<button type="button" class="tk-make" data-tkmake>낱말 골라 문장 만들기<span>›</span></button><ul class="tk-list">${sc.items.map((it, i) => {
@@ -2375,7 +2387,7 @@ function tkRender(){
       <div class="tk-sec">문장 틀</div><div class="tk-chips tpl">${TK.tpls.map((x, i) => `<button type="button" data-tkt="${i}" aria-pressed="${i === tkB.tpl}">${esc(x.label || x.ko)}</button>`).join("")}</div>
       <div class="tk-sec">${esc(grp.name)}</div><div class="tk-chips">${grp.words.map((x, i) => `<button type="button" data-tkw="${i}" aria-pressed="${i === tkB.w}">${esc(x.ko)}</button>`).join("")}</div>
       ${tpl.count ? `<div class="tk-sec">몇 개</div><div class="tk-chips">${TK.nums.koN.map((x, i) => `<button type="button" data-tkn="${i + 1}" aria-pressed="${i + 1 === tkB.n}">${x}</button>`).join("")}</div>` : ""}
-      ${res ? `<div class="tk-acts"><button type="button" class="p" data-tkact="say">소리 듣기</button><button type="button" data-tkact="show">상대에게 보여 주기</button></div>` : ""}
+      ${res ? `<div class="tk-acts"><button type="button" class="p" data-tkact="say">소리 듣기</button><button type="button" data-tkact="show">상대에게 보여 주기</button></div><div class="tk-acts sm"><button type="button" data-tkact="keep">내 문장에 저장</button></div>` : ""}
       <p class="tk-note">문장 틀에 낱말을 끼우면 그 나라 어순에 맞춰 바뀌어요. 발음은 한글로 비슷하게 적은 것이라 소리 듣기와 함께 쓰면 더 정확해요.</p>`;
     tkCur = res ? {ko: res.ko, t, r, a: tpl.a || "yn"} : null;
     return;
@@ -2449,11 +2461,11 @@ document.addEventListener("click", e => { if (e.target.closest("[data-talk]")){ 
 document.getElementById("talkBack").addEventListener("click", closeTalk);
 document.getElementById("talkShowClose").addEventListener("click", closeShow);
 document.getElementById("talkShowSay").addEventListener("click", () => tkCur && tkSpeak(tkCur.t));
-document.getElementById("talkLang").addEventListener("change", e => { tkLang = e.target.value; tkSave({lang: tkLang, place: String((state.trip && state.trip.place) || "")}); tkRender(); render(); });
+document.getElementById("talkLang").addEventListener("change", e => { tkLang = e.target.value; tkOpen = -1; tkEdit = null; tkSave({lang: tkLang, place: String((state.trip && state.trip.place) || "")}); tkRender(); render(); });
 document.getElementById("talkTh").addEventListener("click", e => { const b = e.target.closest("[data-g]"); if (!b) return; tkSave({g: b.dataset.g}); tkRender(); });
 document.getElementById("talkTabs").addEventListener("click", e => {
   const b = e.target.closest("[data-sc]"); if (!b) return;
-  if (b.dataset.sc === "make"){ tkView = "make"; } else { tkView = "list"; tkScene = +b.dataset.sc; tkOpen = -1; }
+  if (b.dataset.sc === "make"){ tkView = "make"; } else if (b.dataset.sc === "mine"){ tkView = "mine"; tkOpen = -1; tkEdit = null; } else { tkView = "list"; tkScene = +b.dataset.sc; tkOpen = -1; }
   tkRender(); tkBody.scrollTop = 0;
 });
 tkBody.addEventListener("click", e => {
@@ -2465,11 +2477,62 @@ tkBody.addEventListener("click", e => {
   if (b.dataset.tkn !== undefined){ tkB.n = +b.dataset.tkn; tkRender(); return; }
   if (b.dataset.tkact === "say"){ if (tkCur) tkSpeak(tkCur.t); return; }
   if (b.dataset.tkact === "show"){ openShow(); return; }
+  if (b.dataset.tkact === "keep"){ if (tkCur) tkKeep({ko: tkCur.ko, t: tkCur.t, r: tkCur.r}); return; }
+  if (b.dataset.tkm !== undefined){ const i = +b.dataset.tkm; tkOpen = tkOpen === i ? -1 : i; tkRender(); return; }
+  if (b.dataset.tkmine === "new"){ tkEdit = "new"; tkRender(); const k = document.getElementById("tkKo"); if (k) k.focus(); return; }
+  if (b.dataset.tkmine === "edit"){ tkEdit = b.dataset.id; tkRender(); return; }
+  if (b.dataset.tkmine === "cancel"){ tkEdit = null; tkRender(); return; }
+  if (b.dataset.tkmine === "save"){ tkMineSave(); return; }
+  if (b.dataset.tkmine === "del"){
+    const before = snapState(), it = (state.talk || []).find(x => x.id === b.dataset.id); if (!it) return;
+    state.talk = state.talk.filter(x => x.id !== it.id); tkOpen = -1; save(); tkRender();
+    offerUndo("내 문장을 지웠어요.", before); const ub = document.querySelector("#undoBar button"); if (ub){ const prev = ub.onclick; ub.onclick = () => { prev && prev(); tkRender(); }; }
+    return;
+  }
 });
+/* 내 문장: 자주 쓰는 말을 직접 등록(번역은 파파고·구글 번역에서 붙여 넣기). 언어별로 따로, 가족 공간이면 함께 씀 */
+let tkEdit = null;
+const tkMineList = () => (state.talk || []).filter(x => x.lang === tkLang);
+const TR_CODE = {ja:"ja", en:"en", zh:"zh-CN", vi:"vi", th:"th", fr:"fr", es:"es", it:"it"};
+function tkTrLinks(ko){
+  const c = TR_CODE[tkLang], q = encodeURIComponent(ko || "");
+  return `<a id="tkPapago" href="https://papago.naver.com/?sk=ko&tk=${c}&st=${q}" target="_blank" rel="noopener">파파고로 번역</a><a id="tkGoogle" href="https://translate.google.com/?sl=ko&tl=${c}&text=${q}&op=translate" target="_blank" rel="noopener">구글 번역</a>`;
+}
+function tkMineRender(lang){
+  const list = tkMineList(), ed = tkEdit && tkEdit !== "new" ? list.find(x => x.id === tkEdit) : null;
+  const form = tkEdit ? `<div class="tk-add" id="tkAdd">
+      <label>한국어<input id="tkKo" maxlength="80" placeholder="예: 아이 의자 있어요?" value="${ed ? esc(ed.ko) : ""}"></label>
+      <div class="tk-tr" id="tkTr">${tkTrLinks(ed ? ed.ko : "")}</div>
+      <label>${esc(lang.name)}<textarea id="tkFx" rows="2" maxlength="200" placeholder="번역기에서 복사해 붙여 넣기" lang="${lang.tts}">${ed ? esc(ed.t) : ""}</textarea></label>
+      <label>읽는 법 (적지 않아도 돼요)<input id="tkRd" maxlength="120" placeholder="예: 코도모요-노 이스와 아리마스카" value="${ed ? esc(ed.r || "") : ""}"></label>
+      <div class="tk-row2"><button type="button" data-tkmine="cancel">취소</button><button type="button" class="p" data-tkmine="save">${ed ? "고치기" : "저장"}</button></div>
+    </div>` : `<button type="button" class="tk-make" data-tkmine="new">+ 내 문장 넣기<span>›</span></button>`;
+  tkBody.innerHTML = form + (list.length ? `<ul class="tk-list">${list.map((it, i) => {
+    const open = i === tkOpen;
+    return `<li class="tk-card${open ? " open" : ""}"><button type="button" class="tk-row" data-tkm="${i}" aria-expanded="${open}"><b>${esc(it.ko)}</b><span class="tk-fx" lang="${lang.tts}">${esc(it.t)}</span>${open || !it.r ? "" : `<span class="tk-rd0">${esc(it.r)}</span>`}</button>${open ? `<div class="tk-more">${it.r ? `<div class="tk-say">${esc(it.r)}</div>` : `<div class="tk-rd0">읽는 법을 적지 않았어요. 소리 듣기로 들어 보세요.</div>`}<div class="tk-acts"><button type="button" class="p" data-tkact="say">소리 듣기</button><button type="button" data-tkact="show">상대에게 보여 주기</button></div><div class="tk-acts sm"><button type="button" data-tkmine="edit" data-id="${it.id}">고치기</button><button type="button" data-tkmine="del" data-id="${it.id}">지우기</button></div></div>` : ""}</li>`;
+  }).join("")}</ul>` : (tkEdit ? "" : `<div class="tk-empty">아직 ${esc(lang.name)} 내 문장이 없어요.<br>자주 쓰는 말을 넣어 두거나, "문장 만들기"에서 만든 문장을 저장해 보세요.</div>`));
+  const it = tkOpen >= 0 ? list[tkOpen] : null;
+  tkCur = it ? {ko: it.ko, t: it.t, r: it.r || "", a: "yn"} : null;
+}
+function tkKeep(o){
+  state.talk = state.talk || [];
+  if (state.talk.some(x => x.lang === tkLang && x.t === o.t)){ toast("이미 내 문장에 있어요."); return; }
+  state.talk.push({id: uid(), lang: tkLang, ko: o.ko, t: o.t, r: o.r || ""}); save(); toast("내 문장에 저장했어요.");
+}
+function tkMineSave(){
+  const ko = document.getElementById("tkKo").value.trim(), t = document.getElementById("tkFx").value.trim(), r = document.getElementById("tkRd").value.trim();
+  if (!ko){ toast("한국어를 적어 주세요."); document.getElementById("tkKo").focus(); return; }
+  if (!t){ toast("번역한 말을 붙여 넣어 주세요."); document.getElementById("tkFx").focus(); return; }
+  state.talk = state.talk || [];
+  if (tkEdit && tkEdit !== "new"){ const it = state.talk.find(x => x.id === tkEdit); if (it) Object.assign(it, {ko, t, r}); toast("고쳤어요."); }
+  else { state.talk.push({id: uid(), lang: tkLang, ko, t, r}); toast("내 문장에 넣었어요."); }
+  tkEdit = null; tkOpen = -1; save(); tkRender();
+}
+tkBody.addEventListener("input", e => { if (e.target.id === "tkKo"){ const tr = document.getElementById("tkTr"); if (tr) tr.innerHTML = tkTrLinks(e.target.value.trim()); } });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !talkEl.hidden) closeTalk(); });
 if (window.speechSynthesis) try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => {}; }catch(e){}
 /* 사용 안내: "? 사용 안내" 단추(첫 화면 위 오른쪽, 설정 맨 위) → 간략 사용법 창 */
-const HELP = [["출발일 · 여행지 · 날씨", ["\"출발일\", \"몇 박\", \"여행지\", \"교통편\"을 적습니다. \"여행지\"에 이름을 치면 찾아 줘요.", "날씨 칸에 도시 이름을 적고 \"찾기\"를 누르면 머무는 날의 현지 날씨가 나와요."]], ["짐 챙기며 체크하기", ["\"출발 체크\"에서 챙긴 물건을 눌러 체크합니다. 위쪽 숫자에 챙긴 개수가 나와요.", "\"챙긴 것 숨기기\"를 켜면 아직 안 챙긴 것만 남습니다.", "\"출력\"을 누르면 지금 목록을 A4 한 장으로 뽑을 수 있어요."]], ["목록 고치기", ["구역마다 \"+ 항목 넣기\"에 적고 \"넣기\"를 누릅니다. 새 구역은 맨 아래 \"+ 구역 추가\"로 만들어요.", "항목 옆 연필을 누르면 이름, \"꼭 챙기기\", 상황을 고칠 수 있어요. \"상황 설정\"에서 만든 상황(해외, 비행기 등)을 붙이면 위쪽 단추로 숨겼다 보였다 해요.", "순서는 왼쪽 손잡이를 끌어 바꿉니다. 휴대폰에서는 먼저 \"순서 편집\"을 눌러요."]], ["일정 · 비용 · 정산", ["\"일정\"에서 날짜를 고르고 시간, 할 일, 메모, 비용을 적은 뒤 \"넣기\"를 누릅니다.", "항공권 · 숙박처럼 날짜와 상관없는 비용은 \"항공 · 숙박 등\"에 적어요.", "\"정산\"을 누르면 합계와 1인당 금액이 나오고, \"정산 내용 복사\"로 단톡방에 붙여 넣을 수 있어요."]], ["여행 회화", ["\"일정\" 화면의 \"여행 회화\"를 누르면 여행지에 맞는 언어로 공항, 호텔, 식당, 길 찾기 문장이 나와요. 문장을 누르면 한글 발음이 크게 보이고 \"소리 듣기\"로 들을 수 있어요.", "\"낱말 골라 문장 만들기\"에서 문장 틀과 낱말을 고르면 그 나라 말 문장이 됩니다.", "\"상대에게 보여 주기\"를 누르면 위쪽 절반이 상대 쪽으로 뒤집혀요. 상대가 자기 말로 된 대답(있어요, 오른쪽, 금액 등)을 누르면 내 쪽에 한국어로 나와요."]], ["돌아올 때 · 기록", ["돌아올 때는 \"돌아올 때\"로 바꿉니다. 출발 때 챙긴 것만 다시 확인해요.", "\"기록\"에서 별점과 한 줄 메모를 남기고 \"이번 여행 기록하기\"를 누르면 체크 · 메모 · 일정 · 비용이 비워집니다. 정산은 기록에 남아요.", "일정 · 비용을 남기고 싶으면 \"설정\"의 \"기록하면 일정 · 비용도 비우기\"를 끕니다."]], ["가족과 함께 쓰기", ["\"가족\" 화면의 \"가족 공간 만들기\"에서 \"만들기\"를 누릅니다.", "\"가족 초대 QR\"을 가족 휴대폰으로 찍게 하면 같은 목록을 함께 씁니다. 한 사람이 체크하면 다른 가족 화면에도 바로 보여요.", "다른 집에 내 목록만 나눠 주려면 \"설정\"의 \"준비물 세팅 공유\"에서 \"보내기\"를 누릅니다."]], ["자주 묻는 것", ["지우거나 비운 바로 뒤에는 화면 아래 \"되돌리기\"를 누르면 돌아옵니다.", "가족 공간에 들어가 있으면 같은 구글 계정으로 다른 기기에서 열어도 그대로 나와요. 로그인하지 않으면 이 기기에만 저장됩니다.", "목록을 처음 상태로 돌리려면 \"설정\"의 \"처음 목록으로 되돌리기\"를 씁니다."]]];
+const HELP = [["출발일 · 여행지 · 날씨", ["\"출발일\", \"몇 박\", \"여행지\", \"교통편\"을 적습니다. \"여행지\"에 이름을 치면 찾아 줘요.", "날씨 칸에 도시 이름을 적고 \"찾기\"를 누르면 머무는 날의 현지 날씨가 나와요."]], ["짐 챙기며 체크하기", ["\"출발 체크\"에서 챙긴 물건을 눌러 체크합니다. 위쪽 숫자에 챙긴 개수가 나와요.", "\"챙긴 것 숨기기\"를 켜면 아직 안 챙긴 것만 남습니다.", "\"출력\"을 누르면 지금 목록을 A4 한 장으로 뽑을 수 있어요."]], ["목록 고치기", ["구역마다 \"+ 항목 넣기\"에 적고 \"넣기\"를 누릅니다. 새 구역은 맨 아래 \"+ 구역 추가\"로 만들어요.", "항목 옆 연필을 누르면 이름, \"꼭 챙기기\", 상황을 고칠 수 있어요. \"상황 설정\"에서 만든 상황(해외, 비행기 등)을 붙이면 위쪽 단추로 숨겼다 보였다 해요.", "순서는 왼쪽 손잡이를 끌어 바꿉니다. 휴대폰에서는 먼저 \"순서 편집\"을 눌러요."]], ["일정 · 비용 · 정산", ["\"일정\"에서 날짜를 고르고 시간, 할 일, 메모, 비용을 적은 뒤 \"넣기\"를 누릅니다.", "항공권 · 숙박처럼 날짜와 상관없는 비용은 \"항공 · 숙박 등\"에 적어요.", "\"정산\"을 누르면 합계와 1인당 금액이 나오고, \"정산 내용 복사\"로 단톡방에 붙여 넣을 수 있어요."]], ["여행 회화", ["\"일정\" 화면의 \"여행 회화\"를 누르면 여행지에 맞는 언어로 공항, 호텔, 식당, 길 찾기 문장이 나와요. 문장을 누르면 한글 발음이 크게 보이고 \"소리 듣기\"로 들을 수 있어요.", "\"낱말 골라 문장 만들기\"에서 문장 틀과 낱말을 고르면 그 나라 말 문장이 됩니다. 자주 쓰는 말은 \"내 문장\"에 직접 넣어 둘 수 있어요(번역은 \"파파고로 번역\"에서 복사해 붙여 넣기).", "\"상대에게 보여 주기\"를 누르면 위쪽 절반이 상대 쪽으로 뒤집혀요. 상대가 자기 말로 된 대답(있어요, 오른쪽, 금액 등)을 누르면 내 쪽에 한국어로 나와요."]], ["돌아올 때 · 기록", ["돌아올 때는 \"돌아올 때\"로 바꿉니다. 출발 때 챙긴 것만 다시 확인해요.", "\"기록\"에서 별점과 한 줄 메모를 남기고 \"이번 여행 기록하기\"를 누르면 체크 · 메모 · 일정 · 비용이 비워집니다. 정산은 기록에 남아요.", "일정 · 비용을 남기고 싶으면 \"설정\"의 \"기록하면 일정 · 비용도 비우기\"를 끕니다."]], ["가족과 함께 쓰기", ["\"가족\" 화면의 \"가족 공간 만들기\"에서 \"만들기\"를 누릅니다.", "\"가족 초대 QR\"을 가족 휴대폰으로 찍게 하면 같은 목록을 함께 씁니다. 한 사람이 체크하면 다른 가족 화면에도 바로 보여요.", "다른 집에 내 목록만 나눠 주려면 \"설정\"의 \"준비물 세팅 공유\"에서 \"보내기\"를 누릅니다."]], ["자주 묻는 것", ["지우거나 비운 바로 뒤에는 화면 아래 \"되돌리기\"를 누르면 돌아옵니다.", "가족 공간에 들어가 있으면 같은 구글 계정으로 다른 기기에서 열어도 그대로 나와요. 로그인하지 않으면 이 기기에만 저장됩니다.", "목록을 처음 상태로 돌리려면 \"설정\"의 \"처음 목록으로 되돌리기\"를 씁니다."]]];
 const helpEl = document.getElementById("helpModal"), IN_DEMO = /[?&]demo(=|&|$)/.test(location.search);
 document.getElementById("helpBody").innerHTML = HELP.map((h, i) => `<section><h4><span class="ccq-num">${i + 1}</span>${esc(h[0])}</h4><ul>${h[1].map(x => `<li>${esc(x)}</li>`).join("")}</ul></section>`).join("");
 document.getElementById("helpDemo").hidden = IN_DEMO;
@@ -2513,7 +2576,7 @@ document.getElementById("newsVer").textContent = "지금 " + APP_VER;
 markNews();
 
 /* ---------- 되돌리기: 빼기·지우기·바꾸기 뒤 몇 초 동안 ---------- */
-const snapState = () => JSON.parse(JSON.stringify({zones:state.zones, labels:state.labels, plans:state.plans || [], costs:state.costs || [], checked:state.checked, back:state.back || {}}));
+const snapState = () => JSON.parse(JSON.stringify({zones:state.zones, labels:state.labels, plans:state.plans || [], costs:state.costs || [], talk:state.talk || [], checked:state.checked, back:state.back || {}}));
 let undoTimer = null;
 function offerUndo(text, before){
   let el = document.getElementById("undoBar");
@@ -2529,7 +2592,7 @@ function restoreState(b){
     Object.keys(now).forEach(id => { if (!was[id]) setCheck(id, false, back); });
   };
   const nowC = state.checked, nowB = state.back || {};
-  state.zones = b.zones; state.labels = b.labels; state.plans = b.plans || []; state.costs = b.costs || []; state.checked = b.checked; state.back = b.back;
+  state.zones = b.zones; state.labels = b.labels; state.plans = b.plans || []; state.costs = b.costs || []; state.talk = b.talk || []; state.checked = b.checked; state.back = b.back;
   syncMap(nowC, b.checked, false); syncMap(nowB, b.back, true);
   save(); render();
 }
