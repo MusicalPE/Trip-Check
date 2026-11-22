@@ -482,6 +482,8 @@ a.chip{text-decoration:none;display:inline-block}
 .tk-chips button[aria-pressed="true"]{background:var(--forest);border-color:var(--forest);color:var(--on-forest)}
 .tk-add{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1.5px solid var(--forest);border-radius:16px;padding:12px;margin-bottom:10px}
 .tk-add label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:800;color:var(--muted)}
+.tk-ansguess{font-weight:700;color:var(--forest);font-size:12.5px}
+.tk-add select{font:inherit;font-size:15px;font-weight:700;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px}
 .tk-add input,.tk-add textarea{font:inherit;font-size:16px;font-weight:400;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical}
 .tk-add .tk-tr{display:flex;gap:8px}
 .tk-add .tk-tr a{flex:1;display:flex;align-items:center;justify-content:center;min-height:42px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--forest);font-weight:800;font-size:14px;text-decoration:none}
@@ -984,7 +986,7 @@ li.imp.on .must{opacity:.4}
 </div>
 
 <script src="kakao-config.js"></script>
-<script src="talk-data.js?v=2.6.0"></script>
+<script src="talk-data.js?v=2.7.0"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <script>
@@ -2097,8 +2099,9 @@ setTab("home");   // 늘 체크 화면부터
 records = local.getData().records; renderRecords();
 
 const APP_ID = "trip", APP_NAME = "트립첵!";
-const APP_VER = "2.6.0";   // 판 번호 — sw.js 의 CACHE 끝 번호와 같게(tests/run.sh check 가 확인)
+const APP_VER = "2.7.0";   // 판 번호 — sw.js 의 CACHE 끝 번호와 같게(tests/run.sh check 가 확인)
 const NEWS = [
+  {v:"2.7.0", d:"2026. 11. 22.", items:["여행 회화 대답 단추가 문장에 맞게 나와요. 길을 물으면 길 안내, '있어요?'에는 있어요 · 없어요, 값을 물으면 숫자판이 떠요. 내 문장은 대답 종류를 저절로 고르거나 직접 고를 수 있어요."]},
   {v:"2.6.0", d:"2026. 11. 22.", items:["여행 회화 '내 문장': 자주 쓰는 말을 직접 넣어 둘 수 있어요. [파파고로 번역] · [구글 번역]으로 번역해 붙여 넣고, 문장 만들기에서 만든 문장도 저장할 수 있어요. 가족 공간에서는 가족과 함께 써요."]},
   {v:"2.5.0", d:"2026. 11. 22.", items:["여행 회화 대답 듣기: '상대에게 보여 주기' 화면에서 상대가 자기 나라 말로 된 대답(네 · 있어요 · 오른쪽 · 저쪽 등)을 누르면 내 쪽에 한국어로 나와요. '얼마예요?'에는 상대가 금액을 숫자로 눌러 알려 줄 수 있어요."]},
   {v:"2.4.0", d:"2026. 11. 22.", items:["여행 회화: '일정' 화면의 [여행 회화]에서 8개 언어(일본어 · 영어 · 중국어 · 베트남어 · 태국어 · 프랑스어 · 스페인어 · 이탈리아어)로 공항 · 호텔 · 식당 · 길 찾기 · 쇼핑 · 급할 때 문장을 볼 수 있어요. 한글 발음과 소리 듣기, 낱말 골라 문장 만들기, 상대에게 보여 주기도 돼요."]},
@@ -2389,11 +2392,11 @@ function tkRender(){
       ${tpl.count ? `<div class="tk-sec">몇 개</div><div class="tk-chips">${TK.nums.koN.map((x, i) => `<button type="button" data-tkn="${i + 1}" aria-pressed="${i + 1 === tkB.n}">${x}</button>`).join("")}</div>` : ""}
       ${res ? `<div class="tk-acts"><button type="button" class="p" data-tkact="say">소리 듣기</button><button type="button" data-tkact="show">상대에게 보여 주기</button></div><div class="tk-acts sm"><button type="button" data-tkact="keep">내 문장에 저장</button></div>` : ""}
       <p class="tk-note">문장 틀에 낱말을 끼우면 그 나라 어순에 맞춰 바뀌어요. 발음은 한글로 비슷하게 적은 것이라 소리 듣기와 함께 쓰면 더 정확해요.</p>`;
-    tkCur = res ? {ko: res.ko, t, r, a: tpl.a || "yn"} : null;
+    tkCur = res ? {ko: res.ko, t, r, a: tpl.a || tkGuessAns(res.ko)} : null;
     return;
   }
   const it = tkOpen >= 0 ? TK.scenes[tkScene].items[tkOpen] : null;
-  tkCur = it ? (() => { const [t, r] = tkFill(it[tkLang]); return {ko: it.ko.replace(/\s*\(.*\)$/, ""), t, r, a: it.a || "yn"}; })() : null;
+  tkCur = it ? (() => { const [t, r] = tkFill(it[tkLang]); return {ko: it.ko.replace(/\s*\(.*\)$/, ""), t, r, a: it.a || tkGuessAns(it.ko)}; })() : null;
 }
 function openTalk(){
   if (!TK){ toast("여행 회화 자료를 불러오지 못했어요. 인터넷 연결을 확인해 주세요."); return; }
@@ -2425,7 +2428,7 @@ function openShow(){
 let tkNum = "";
 function tkAnsRender(){
   const box = document.getElementById("talkAnsBtns"), them = document.querySelector(".tk-them");
-  if (!TK.answerSets || !TK.answers || !TK.ask){ box.innerHTML = ""; document.getElementById("talkAsk").textContent = ""; them.classList.remove("has-ans"); return; }   // 예전 자료 파일이면 대답 단추 없이
+  if (!TK.answerSets || !TK.answers || !TK.ask || tkCur.a === "none"){ box.innerHTML = ""; document.getElementById("talkAsk").textContent = ""; them.classList.remove("has-ans"); return; }   // 예전 자료 파일이면 대답 단추 없이
   const L = tkLang, set = TK.answerSets[tkCur.a] || TK.answerSets.yn, num = tkCur.a === "num";
   document.querySelector(".tk-them").classList.add("has-ans");
   document.getElementById("talkAsk").textContent = TK.ask[num ? "num" : "pick"][L] || "";
@@ -2479,8 +2482,8 @@ tkBody.addEventListener("click", e => {
   if (b.dataset.tkact === "show"){ openShow(); return; }
   if (b.dataset.tkact === "keep"){ if (tkCur) tkKeep({ko: tkCur.ko, t: tkCur.t, r: tkCur.r}); return; }
   if (b.dataset.tkm !== undefined){ const i = +b.dataset.tkm; tkOpen = tkOpen === i ? -1 : i; tkRender(); return; }
-  if (b.dataset.tkmine === "new"){ tkEdit = "new"; tkRender(); const k = document.getElementById("tkKo"); if (k) k.focus(); return; }
-  if (b.dataset.tkmine === "edit"){ tkEdit = b.dataset.id; tkRender(); return; }
+  if (b.dataset.tkmine === "new"){ tkEdit = "new"; tkRender(); tkAnsHint(); const k = document.getElementById("tkKo"); if (k) k.focus(); return; }
+  if (b.dataset.tkmine === "edit"){ tkEdit = b.dataset.id; tkRender(); tkAnsHint(); return; }
   if (b.dataset.tkmine === "cancel"){ tkEdit = null; tkRender(); return; }
   if (b.dataset.tkmine === "save"){ tkMineSave(); return; }
   if (b.dataset.tkmine === "del"){
@@ -2492,6 +2495,15 @@ tkBody.addEventListener("click", e => {
 });
 /* 내 문장: 자주 쓰는 말을 직접 등록(번역은 파파고·구글 번역에서 붙여 넣기). 언어별로 따로, 가족 공간이면 함께 씀 */
 let tkEdit = null;
+/* 한국어 문장을 보고 상대 대답 단추 종류 고르기 */
+function tkGuessAns(ko){
+  const k = String(ko || "");
+  if (/얼마/.test(k)) return "num";
+  if (/어디|어떻게 가|가고 싶|가 주세요|가요\?|가나요|길|찾고 있/.test(k)) return "dir";
+  if (/있어요\?|있나요|있습니까|있어\?/.test(k)) return "have";
+  return "yn";
+}
+const TK_ANS_NAMES = [["auto", "저절로 고르기"], ["yn", "네 · 아니요 · 돼요"], ["have", "있어요 · 없어요"], ["dir", "길 안내 (쭉 · 오른쪽 · 멀어요)"], ["num", "금액 (숫자판)"], ["none", "대답 단추 없이"]];
 const tkMineList = () => (state.talk || []).filter(x => x.lang === tkLang);
 const TR_CODE = {ja:"ja", en:"en", zh:"zh-CN", vi:"vi", th:"th", fr:"fr", es:"es", it:"it"};
 function tkTrLinks(ko){
@@ -2505,6 +2517,7 @@ function tkMineRender(lang){
       <div class="tk-tr" id="tkTr">${tkTrLinks(ed ? ed.ko : "")}</div>
       <label>${esc(lang.name)}<textarea id="tkFx" rows="2" maxlength="200" placeholder="번역기에서 복사해 붙여 넣기" lang="${lang.tts}">${ed ? esc(ed.t) : ""}</textarea></label>
       <label>읽는 법 (적지 않아도 돼요)<input id="tkRd" maxlength="120" placeholder="예: 코도모요-노 이스와 아리마스카" value="${ed ? esc(ed.r || "") : ""}"></label>
+      <label>상대가 누를 대답 단추<select id="tkAns">${TK_ANS_NAMES.map(([v, n]) => `<option value="${v}" ${v === ((ed && ed.a) || "auto") ? "selected" : ""}>${n}</option>`).join("")}</select><small class="tk-ansguess" id="tkAnsGuess"></small></label>
       <div class="tk-row2"><button type="button" data-tkmine="cancel">취소</button><button type="button" class="p" data-tkmine="save">${ed ? "고치기" : "저장"}</button></div>
     </div>` : `<button type="button" class="tk-make" data-tkmine="new">+ 내 문장 넣기<span>›</span></button>`;
   tkBody.innerHTML = form + (list.length ? `<ul class="tk-list">${list.map((it, i) => {
@@ -2512,7 +2525,7 @@ function tkMineRender(lang){
     return `<li class="tk-card${open ? " open" : ""}"><button type="button" class="tk-row" data-tkm="${i}" aria-expanded="${open}"><b>${esc(it.ko)}</b><span class="tk-fx" lang="${lang.tts}">${esc(it.t)}</span>${open || !it.r ? "" : `<span class="tk-rd0">${esc(it.r)}</span>`}</button>${open ? `<div class="tk-more">${it.r ? `<div class="tk-say">${esc(it.r)}</div>` : `<div class="tk-rd0">읽는 법을 적지 않았어요. 소리 듣기로 들어 보세요.</div>`}<div class="tk-acts"><button type="button" class="p" data-tkact="say">소리 듣기</button><button type="button" data-tkact="show">상대에게 보여 주기</button></div><div class="tk-acts sm"><button type="button" data-tkmine="edit" data-id="${it.id}">고치기</button><button type="button" data-tkmine="del" data-id="${it.id}">지우기</button></div></div>` : ""}</li>`;
   }).join("")}</ul>` : (tkEdit ? "" : `<div class="tk-empty">아직 ${esc(lang.name)} 내 문장이 없어요.<br>자주 쓰는 말을 넣어 두거나, "문장 만들기"에서 만든 문장을 저장해 보세요.</div>`));
   const it = tkOpen >= 0 ? list[tkOpen] : null;
-  tkCur = it ? {ko: it.ko, t: it.t, r: it.r || "", a: "yn"} : null;
+  tkCur = it ? {ko: it.ko, t: it.t, r: it.r || "", a: it.a && it.a !== "auto" ? it.a : tkGuessAns(it.ko)} : null;
 }
 function tkKeep(o){
   state.talk = state.talk || [];
@@ -2520,15 +2533,20 @@ function tkKeep(o){
   state.talk.push({id: uid(), lang: tkLang, ko: o.ko, t: o.t, r: o.r || ""}); save(); toast("내 문장에 저장했어요.");
 }
 function tkMineSave(){
-  const ko = document.getElementById("tkKo").value.trim(), t = document.getElementById("tkFx").value.trim(), r = document.getElementById("tkRd").value.trim();
+  const ko = document.getElementById("tkKo").value.trim(), t = document.getElementById("tkFx").value.trim(), r = document.getElementById("tkRd").value.trim(), a = document.getElementById("tkAns").value;
   if (!ko){ toast("한국어를 적어 주세요."); document.getElementById("tkKo").focus(); return; }
   if (!t){ toast("번역한 말을 붙여 넣어 주세요."); document.getElementById("tkFx").focus(); return; }
   state.talk = state.talk || [];
-  if (tkEdit && tkEdit !== "new"){ const it = state.talk.find(x => x.id === tkEdit); if (it) Object.assign(it, {ko, t, r}); toast("고쳤어요."); }
-  else { state.talk.push({id: uid(), lang: tkLang, ko, t, r}); toast("내 문장에 넣었어요."); }
+  if (tkEdit && tkEdit !== "new"){ const it = state.talk.find(x => x.id === tkEdit); if (it) Object.assign(it, {ko, t, r, a}); toast("고쳤어요."); }
+  else { state.talk.push({id: uid(), lang: tkLang, ko, t, r, a}); toast("내 문장에 넣었어요."); }
   tkEdit = null; tkOpen = -1; save(); tkRender();
 }
-tkBody.addEventListener("input", e => { if (e.target.id === "tkKo"){ const tr = document.getElementById("tkTr"); if (tr) tr.innerHTML = tkTrLinks(e.target.value.trim()); } });
+function tkAnsHint(){
+  const sel = document.getElementById("tkAns"), g = document.getElementById("tkAnsGuess"), ko = document.getElementById("tkKo"); if (!sel || !g) return;
+  g.textContent = sel.value === "auto" ? "지금 문장이면: " + TK_ANS_NAMES.find(x => x[0] === tkGuessAns(ko.value))[1] : "";
+}
+tkBody.addEventListener("input", e => { if (e.target.id === "tkKo"){ const tr = document.getElementById("tkTr"); if (tr) tr.innerHTML = tkTrLinks(e.target.value.trim()); tkAnsHint(); } });
+tkBody.addEventListener("change", e => { if (e.target.id === "tkAns") tkAnsHint(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !talkEl.hidden) closeTalk(); });
 if (window.speechSynthesis) try{ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => {}; }catch(e){}
 /* 사용 안내: "? 사용 안내" 단추(첫 화면 위 오른쪽, 설정 맨 위) → 간략 사용법 창 */

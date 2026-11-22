@@ -61,7 +61,7 @@ window.TALK = {
     {id:"shop", name:"쇼핑", items:[
       {ko:"이거 얼마예요?", a:"num", ja:["これはいくらですか？","코레와 이쿠라데스카"], en:["How much is this?","하우 머치 이즈 디스"], zh:["这个多少钱？","저거 둬샤오 첸"], vi:["Cái này bao nhiêu tiền?","까이 나이 바오 니에우 띠엔"], th:["อันนี้ราคาเท่าไหร่{P}","안니 라카 타오라이 {P}"], fr:["Combien ça coûte ?","꽁비앙 사 꾸뜨"], es:["¿Cuánto cuesta esto?","꽌또 꾸에스따 에스또"], it:["Quanto costa questo?","콴토 코스타 쿠에스토"]},
       {ko:"입어 봐도 돼요?", ja:["試着してもいいですか？","시챠쿠 시테모 이-데스카"], en:["Can I try this on?","캔 아이 트라이 디스 온"], zh:["可以试穿吗？","커이 스촨 마"], vi:["Tôi mặc thử được không?","또이 막 트 드억 콩"], th:["ลองได้ไหม{P}","렁 다이 마이 {P}"], fr:["Je peux l'essayer ?","주 쁘 레세이예"], es:["¿Me lo puedo probar?","메 로 뿌에도 쁘로바르"], it:["Posso provarlo?","포쏘 프로바를로"]},
-      {ko:"다른 사이즈 있어요?", ja:["他のサイズはありますか？","호카노 사이즈와 아리마스카"], en:["Do you have another size?","두 유 해브 어나더 사이즈"], zh:["有别的尺码吗？","여우 비에 더 츠마 마"], vi:["Có cỡ khác không?","꼬 꺼 칵 콩"], th:["มีไซซ์อื่นไหม{P}","미 사이 은 마이 {P}"], fr:["Vous avez une autre taille ?","부 자베 윈 오뜨르 따이"], es:["¿Tiene otra talla?","띠에네 오뜨라 따야"], it:["Avete un'altra taglia?","아베테 운알트라 탈리아"]},
+      {ko:"다른 사이즈 있어요?", a:"have", ja:["他のサイズはありますか？","호카노 사이즈와 아리마스카"], en:["Do you have another size?","두 유 해브 어나더 사이즈"], zh:["有别的尺码吗？","여우 비에 더 츠마 마"], vi:["Có cỡ khác không?","꼬 꺼 칵 콩"], th:["มีไซซ์อื่นไหม{P}","미 사이 은 마이 {P}"], fr:["Vous avez une autre taille ?","부 자베 윈 오뜨르 따이"], es:["¿Tiene otra talla?","띠에네 오뜨라 따야"], it:["Avete un'altra taglia?","아베테 운알트라 탈리아"]},
       {ko:"조금 깎아 주실 수 있어요?", ja:["少し安くなりませんか？","스코시 야스쿠 나리마센카"], en:["Can you give me a discount?","캔 유 기브 미 어 디스카운트"], zh:["能便宜一点吗？","넝 피엔이 이디엔 마"], vi:["Bớt chút được không?","벗 쭛 드억 콩"], th:["ลดหน่อยได้ไหม{P}","롯 너이 다이 마이 {P}"], fr:["Vous pouvez faire un prix ?","부 뿌베 페르 앙 프리"], es:["¿Me hace un descuento?","메 아세 운 데스꾸엔또"], it:["Mi fa uno sconto?","미 파 우노 스콘토"]},
       {ko:"세금 환급(면세) 돼요?", ja:["免税できますか？","멘제- 데키마스카"], en:["Can I get a tax refund?","캔 아이 겟 어 택스 리펀드"], zh:["可以退税吗？","커이 투이수이 마"], vi:["Có hoàn thuế không?","꼬 호안 투에 콩"], th:["ขอคืนภาษีได้ไหม{P}","커 큰 파씨 다이 마이 {P}"], fr:["Je peux avoir la détaxe ?","주 쁘 아부아르 라 데딱스"], es:["¿Hacen devolución de impuestos?","아센 데볼루시온 데 임뿌에스또스"], it:["Posso avere il rimborso IVA?","포쏘 아베레 일 림보르소 이바"]},
       {ko:"봉투 주세요.", ja:["袋をください。","후쿠로오 쿠다사이"], en:["Can I have a bag?","캔 아이 해브 어 백"], zh:["请给我一个袋子。","칭 게이 워 이거 다이쯔"], vi:["Cho tôi một cái túi.","쪼 또이 못 까이 뚜이"], th:["ขอถุงด้วย{P}","커 퉁 두어이 {P}"], fr:["Un sac, s'il vous plaît.","앙 삭, 실 부 플레"], es:["Una bolsa, por favor.","우나 볼사, 뽀르 파보르"], it:["Una busta, per favore.","우나 부스타, 페르 파보레"]}
@@ -81,7 +81,7 @@ window.TALK = {
     {id:"want", ko:"○ 주세요", group:"item",
       ja:["{X}をください。","{x}오 쿠다사이"], en:["{X}, please.","{x}, 플리즈"], zh:["请给我{X}。","칭 게이 워 {x}"], vi:["Cho tôi {X}.","쪼 또이 {x}"], th:["ขอ{X}{P}","커 {x} {P}"], fr:["{X}, s'il vous plaît.","{x}, 실 부 플레"], es:["{X}, por favor.","{x}, 뽀르 파보르"], it:["{X}, per favore.","{x}, 페르 파보레"]},
     {id:"count", ko:"○ ○ 주세요", label:"○ 몇 개 주세요", group:"drink", count:true},
-    {id:"have", ko:"○ 있어요?", group:"item", form:"have",
+    {id:"have", a:"have", ko:"○ 있어요?", group:"item", form:"have",
       ja:["{X}はありますか？","{x}와 아리마스카"], en:["Do you have {X}?","두 유 해브 {x}"], zh:["有{X}吗？","여우 {x} 마"], vi:["Có {X} không?","꼬 {x} 콩"], th:["มี{X}ไหม{P}","미 {x} 마이 {P}"], fr:["Vous avez {X} ?","부 자베 {x}"], es:["¿Tiene {X}?","띠에네 {x}"], it:["Avete {X}?","아베테 {x}"]},
     {id:"where", a:"dir", ko:"○ 어디예요?", group:"place",
       ja:["{X}はどこですか？","{x}와 도코데스카"], en:["Where is {X}?","웨어 이즈 {x}"], zh:["{X}在哪里？","{x} 짜이 나리"], vi:["{X} ở đâu?","{x} 어 더우"], th:["{X}อยู่ที่ไหน{P}","{x} 유 티나이 {P}"], fr:["Où {X} ?","우 {x}"], es:["¿Dónde {X}?","돈데 {x}"], it:["{X}?","{x}"]},
@@ -177,8 +177,9 @@ window.TALK = {
     map:     {ko:"지도를 보여 주세요", ja:"地図を見せてください", en:"Show me a map", zh:"给我看地图", vi:"Cho tôi xem bản đồ", th:"ขอดูแผนที่", fr:"Montrez-moi la carte", es:"Enséñeme el mapa", it:"Mi mostri la mappa"}
   },
   answerSets: {
-    yn:  ["yes", "no", "have", "none", "ok", "cant", "wait", "dunno"],
-    dir: ["straight", "right", "left", "there", "near", "far", "map", "dunno"],
+    yn:  ["yes", "no", "ok", "cant", "wait", "dunno"],
+    have:["have", "none", "yes", "no", "wait", "dunno"],
+    dir: ["ok", "straight", "right", "left", "there", "near", "far", "map", "dunno"],
     num: ["wait", "dunno"]
   },
   /* 상대 쪽 안내 글 */
