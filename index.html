@@ -974,7 +974,7 @@ li.imp.on .must{opacity:.4}
 </div>
 
 <script src="kakao-config.js"></script>
-<script src="talk-data.js"></script>
+<script src="talk-data.js?v=2.5.1"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <script>
@@ -2087,7 +2087,7 @@ setTab("home");   // 늘 체크 화면부터
 records = local.getData().records; renderRecords();
 
 const APP_ID = "trip", APP_NAME = "트립첵!";
-const APP_VER = "2.5.0";   // 판 번호 — sw.js 의 CACHE 끝 번호와 같게(tests/run.sh check 가 확인)
+const APP_VER = "2.5.1";   // 판 번호 — sw.js 의 CACHE 끝 번호와 같게(tests/run.sh check 가 확인)
 const NEWS = [
   {v:"2.5.0", d:"2026. 11. 22.", items:["여행 회화 대답 듣기: '상대에게 보여 주기' 화면에서 상대가 자기 나라 말로 된 대답(네 · 있어요 · 오른쪽 · 저쪽 등)을 누르면 내 쪽에 한국어로 나와요. '얼마예요?'에는 상대가 금액을 숫자로 눌러 알려 줄 수 있어요."]},
   {v:"2.4.0", d:"2026. 11. 22.", items:["여행 회화: '일정' 화면의 [여행 회화]에서 8개 언어(일본어 · 영어 · 중국어 · 베트남어 · 태국어 · 프랑스어 · 스페인어 · 이탈리아어)로 공항 · 호텔 · 식당 · 길 찾기 · 쇼핑 · 급할 때 문장을 볼 수 있어요. 한글 발음과 소리 듣기, 낱말 골라 문장 만들기, 상대에게 보여 주기도 돼요."]},
@@ -2406,13 +2406,15 @@ function openShow(){
   document.getElementById("talkKo").textContent = tkCur.ko;
   document.getElementById("talkRd").textContent = tkCur.r;
   tkNum = ""; document.getElementById("talkReply").hidden = true;
-  tkAnsRender();
-  document.getElementById("talkShow").hidden = false;
+  document.getElementById("talkShow").hidden = false;                // 대답 자료가 없어도 화면은 먼저 열기
+  try{ tkAnsRender(); }catch(e){ console.warn(e); }
 }
 /* 상대가 눌러 주는 대답(그 나라 말) → 내 쪽에 한국어 */
 let tkNum = "";
 function tkAnsRender(){
-  const L = tkLang, set = TK.answerSets[tkCur.a] || TK.answerSets.yn, box = document.getElementById("talkAnsBtns"), num = tkCur.a === "num";
+  const box = document.getElementById("talkAnsBtns"), them = document.querySelector(".tk-them");
+  if (!TK.answerSets || !TK.answers || !TK.ask){ box.innerHTML = ""; document.getElementById("talkAsk").textContent = ""; them.classList.remove("has-ans"); return; }   // 예전 자료 파일이면 대답 단추 없이
+  const L = tkLang, set = TK.answerSets[tkCur.a] || TK.answerSets.yn, num = tkCur.a === "num";
   document.querySelector(".tk-them").classList.add("has-ans");
   document.getElementById("talkAsk").textContent = TK.ask[num ? "num" : "pick"][L] || "";
   box.className = "tk-ansbtns" + (num ? " num" : "");
